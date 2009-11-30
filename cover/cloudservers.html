@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>cloudservers</title>
+</head>
+<body>
+cloudservers
+<style>
+.coverage pre {float: left; margin: 0px 1em; border: none;
+               padding: 0px; }
+.num pre { margin: 0px }
+.nocov, .nocov pre {background-color: #faa}
+.cov, .cov pre {background-color: #cfc}
+div.coverage div { clear: both; height: 1.1em}
+</style>
+<div class="stats">
+Covered: 8 lines<br/>
+Missed: 0 lines<br/>
+Skipped 1 lines<br/>
+Percent: 100 %<br/>
+
+</div>
+<div class="coverage">
+<div class="cov"><span class="num"><pre>1</pre></span><pre>from .client import CloudServersClient</pre></div>
+<div class="cov"><span class="num"><pre>2</pre></span><pre>from .flavors import FlavorManager</pre></div>
+<div class="cov"><span class="num"><pre>3</pre></span><pre>from .images import ImageManager</pre></div>
+<div class="skip"><span class="num"><pre>4</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>5</pre></span><pre>class CloudServers(object):</pre></div>
+<div class="cov"><span class="num"><pre>6</pre></span><pre>    def __init__(self, username, apikey):</pre></div>
+<div class="cov"><span class="num"><pre>7</pre></span><pre>        self.client = CloudServersClient(username, apikey)</pre></div>
+<div class="cov"><span class="num"><pre>8</pre></span><pre>        self.flavors = FlavorManager(self.client)</pre></div>
+<div class="cov"><span class="num"><pre>9</pre></span><pre>        self.images = ImageManager(self.client)</pre></div>
+</div>
+</body>
+</html>

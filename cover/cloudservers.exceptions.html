@@ -1,0 +1,72 @@
+<html>
+<head>
+<title>cloudservers.exceptions</title>
+</head>
+<body>
+cloudservers.exceptions
+<style>
+.coverage pre {float: left; margin: 0px 1em; border: none;
+               padding: 0px; }
+.num pre { margin: 0px }
+.nocov, .nocov pre {background-color: #faa}
+.cov, .cov pre {background-color: #cfc}
+div.coverage div { clear: both; height: 1.1em}
+</style>
+<div class="stats">
+Covered: 35 lines<br/>
+Missed: 2 lines<br/>
+Skipped 10 lines<br/>
+Percent: 94 %<br/>
+
+</div>
+<div class="coverage">
+<div class="cov"><span class="num"><pre> 1</pre></span><pre>class CloudServersException(Exception):</pre></div>
+<div class="cov"><span class="num"><pre> 2</pre></span><pre>    def __init__(self, code, message=None, details=None):</pre></div>
+<div class="cov"><span class="num"><pre> 3</pre></span><pre>        self.code = code</pre></div>
+<div class="cov"><span class="num"><pre> 4</pre></span><pre>        self.message = message or self.__class__.message</pre></div>
+<div class="cov"><span class="num"><pre> 5</pre></span><pre>        self.details = details</pre></div>
+<div class="skip"><span class="num"><pre> 6</pre></span><pre>        </pre></div>
+<div class="cov"><span class="num"><pre> 7</pre></span><pre>    def __str__(self):</pre></div>
+<div class="nocov"><span class="num"><pre> 8</pre></span><pre>        return &quot;%s (HTTP %s)&quot; % (self.message, self.code)</pre></div>
+<div class="skip"><span class="num"><pre> 9</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>10</pre></span><pre>class BadRequest(CloudServersException):</pre></div>
+<div class="cov"><span class="num"><pre>11</pre></span><pre>    http_status = 400</pre></div>
+<div class="cov"><span class="num"><pre>12</pre></span><pre>    message = &quot;Bad request&quot;</pre></div>
+<div class="skip"><span class="num"><pre>13</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>14</pre></span><pre>class Unauthorized(CloudServersException):</pre></div>
+<div class="cov"><span class="num"><pre>15</pre></span><pre>    http_status = 401</pre></div>
+<div class="cov"><span class="num"><pre>16</pre></span><pre>    message = &quot;Unauthorized&quot;</pre></div>
+<div class="skip"><span class="num"><pre>17</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>18</pre></span><pre>class Forbidden(CloudServersException):</pre></div>
+<div class="cov"><span class="num"><pre>19</pre></span><pre>    http_status = 403</pre></div>
+<div class="cov"><span class="num"><pre>20</pre></span><pre>    message = &quot;Forbidden&quot;</pre></div>
+<div class="skip"><span class="num"><pre>21</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>22</pre></span><pre>class NotFound(CloudServersException):</pre></div>
+<div class="cov"><span class="num"><pre>23</pre></span><pre>    http_status = 404</pre></div>
+<div class="cov"><span class="num"><pre>24</pre></span><pre>    message = &quot;Not found&quot;</pre></div>
+<div class="skip"><span class="num"><pre>25</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>26</pre></span><pre>class OverLimit(CloudServersException):</pre></div>
+<div class="cov"><span class="num"><pre>27</pre></span><pre>    http_status = 413</pre></div>
+<div class="cov"><span class="num"><pre>28</pre></span><pre>    message = &quot;Over limit&quot;</pre></div>
+<div class="skip"><span class="num"><pre>29</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>30</pre></span><pre>_code_map = dict((c.http_status, c) for c in CloudServersException.__subclasses__())</pre></div>
+<div class="skip"><span class="num"><pre>31</pre></span><pre></pre></div>
+<div class="cov"><span class="num"><pre>32</pre></span><pre>def from_response(response, body):</pre></div>
+<div class="cov"><span class="num"><pre>33</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>34</pre></span><pre>    Return an instance of a CloudServersException or subclass</pre></div>
+<div class="cov"><span class="num"><pre>35</pre></span><pre>    based on an httplib2 response. </pre></div>
+<div class="skip"><span class="num"><pre>36</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>37</pre></span><pre>    Usage::</pre></div>
+<div class="skip"><span class="num"><pre>38</pre></span><pre>    </pre></div>
+<div class="cov"><span class="num"><pre>39</pre></span><pre>        resp, body = http.request(...)</pre></div>
+<div class="cov"><span class="num"><pre>40</pre></span><pre>        if resp.status != 200:</pre></div>
+<div class="cov"><span class="num"><pre>41</pre></span><pre>            raise exception_from_response(resp, body)</pre></div>
+<div class="cov"><span class="num"><pre>42</pre></span><pre>    &quot;&quot;&quot;</pre></div>
+<div class="cov"><span class="num"><pre>43</pre></span><pre>    cls = _code_map.get(response.status, CloudServersException)</pre></div>
+<div class="cov"><span class="num"><pre>44</pre></span><pre>    if body:</pre></div>
+<div class="nocov"><span class="num"><pre>45</pre></span><pre>        return cls(**body['cloudServersFault'])</pre></div>
+<div class="cov"><span class="num"><pre>46</pre></span><pre>    else:</pre></div>
+<div class="cov"><span class="num"><pre>47</pre></span><pre>        return cls(code=response.status)</pre></div>
+</div>
+</body>
+</html>
