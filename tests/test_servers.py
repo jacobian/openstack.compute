@@ -51,3 +51,26 @@ def test_update_server():
 def test_delete_server():
     cs.servers.delete(1234)
     cs.assert_called('DELETE', '/servers/1234')
+    
+def test_share_ip():
+    s = cs.servers.get(1234)
+    
+    # Share via instance
+    s.share_ip(ipgroup=1, address='1.2.3.4')
+    cs.assert_called('PUT', '/servers/1234/ips/public/1.2.3.4')
+    
+    # Share via manager
+    cs.servers.share_ip(s, ipgroup=1, address='1.2.3.4', configure=False)
+    cs.assert_called('PUT', '/servers/1234/ips/public/1.2.3.4')
+    
+def test_unshare_ip():
+    s = cs.servers.get(1234)
+    
+    # Unshare via instance
+    s.unshare_ip('1.2.3.4')
+    cs.assert_called('DELETE', '/servers/1234/ips/public/1.2.3.4')
+    
+    # Unshare via manager
+    cs.servers.unshare_ip(s, '1.2.3.4')
+    cs.assert_called('DELETE', '/servers/1234/ips/public/1.2.3.4')
+    

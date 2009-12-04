@@ -10,6 +10,18 @@ class Server(base.Resource):
     def update(self, name=None, password=None):
         self.manager.update(self, name, password)
     
+    def share_ip(self, ipgroup, address, configure=True):
+        """
+        Share an IP address from the given IP group onto this server.
+        """
+        self.manager.share_ip(self, ipgroup, address, configure)
+    
+    def unshare_ip(self, address):
+        """
+        Remove the shared address from this server.
+        """
+        self.manager.unshare_ip(self, address)
+    
 class ServerManager(base.Manager):
     resource_class = Server
     
@@ -46,3 +58,19 @@ class ServerManager(base.Manager):
         
     def delete(self, server):
         self._delete("/servers/%s" % base.getid(server))
+
+    def share_ip(self, server, ipgroup, address, configure=True):
+        """
+        Share an IP address from the given IP group onto this server.
+        """
+        server = base.getid(server)
+        ipgroup = base.getid(ipgroup)
+        body = {'shareIp': {'sharedIpGroupId': ipgroup, 'configureServer': configure}}
+        self._update("/servers/%s/ips/public/%s" % (server, address), body)
+        
+    def unshare_ip(self, server, address):
+        """
+        Remove the shared address from this server.
+        """
+        server = base.getid(server)
+        self._delete("/servers/%s/ips/public/%s" % (server, address))

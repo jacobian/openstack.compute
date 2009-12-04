@@ -190,10 +190,10 @@ class FakeClient(CloudServersClient):
     
     def put_servers_1234_ips_public_1_2_3_4(self, body, **kw):
         nt.assert_equal(body.keys(), ['shareIp'])
-        assert_has_keys(body, required=['sharedGroupId', 'configureServer'])
+        assert_has_keys(body['shareIp'], required=['sharedIpGroupId', 'configureServer'])
         return (202, None)
     
-    def delete_servers_1234_ips_public_1_2_3_4(self, body, **kw):
+    def delete_servers_1234_ips_public_1_2_3_4(self, **kw):
         return (202, None)
         
     #
