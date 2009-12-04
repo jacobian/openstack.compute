@@ -25,6 +25,7 @@ class FakeServer(CloudServers):
         """
         nt.assert_equal(self.client.callstack[-1], (method, url),
                         'Expected %s %s; got %s %s' % (self.client.callstack[-1] + (method, url)))
+        self.client.callstack = []
 
 class FakeClient(CloudServersClient):
     def __init__(self):

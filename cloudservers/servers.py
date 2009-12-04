@@ -1,5 +1,7 @@
 from . import base
 
+SOFT, HARD = 'SOFT', 'HARD'
+
 class Server(base.Resource):
     def __repr__(self):
         return "<Server: %s>" % self.name
@@ -21,6 +23,21 @@ class Server(base.Resource):
         Remove the shared address from this server.
         """
         self.manager.unshare_ip(self, address)
+    
+    def reboot(self, type=SOFT):
+        self.manager.reboot(self)
+        
+    def rebuild(self, image):
+        self.manager.rebuild(self, image)
+        
+    def resize(self, flavor):
+        self.manager.resize(self, flavor)
+        
+    def confirm_resize(self):
+        self.manager.confirm_resize(self)
+        
+    def revert_resize(self):
+        self.manager.revert_resize(self)
     
 class ServerManager(base.Manager):
     resource_class = Server
@@ -74,3 +91,24 @@ class ServerManager(base.Manager):
         """
         server = base.getid(server)
         self._delete("/servers/%s/ips/public/%s" % (server, address))
+    
+    def _action(self, action, server, info=None):
+        """
+        Perform a server "action" -- reboot/rebuild/resize/etc.
+        """
+        self.api.client.post('/servers/%s/action' % base.getid(server), body={action: info})
+    
+    def reboot(self, server, type=SOFT):
+        self._action('reboot', server, {'type':type})
+        
+    def rebuild(self, server, image):
+        self._action('rebuild', server, {'imageId': base.getid(image)})
+
+    def resize(self, server, flavor):
+        self._action('resize', server, {'flavorId': base.getid(flavor)})
+        
+    def confirm_resize(self, server):
+        self._action('confirmResize', server)
+        
+    def revert_resize(self, server):
+        self._action('revertResize', server)        

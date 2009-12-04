@@ -73,4 +73,38 @@ def test_unshare_ip():
     # Unshare via manager
     cs.servers.unshare_ip(s, '1.2.3.4')
     cs.assert_called('DELETE', '/servers/1234/ips/public/1.2.3.4')
+
+def test_reboot_server():
+    s = cs.servers.get(1234)
+    s.reboot()
+    cs.assert_called('POST', '/servers/1234/action')
+    cs.servers.reboot(s, type='HARD')
+    cs.assert_called('POST', '/servers/1234/action')
     
+def test_rebuild_server():
+    s = cs.servers.get(1234)
+    s.rebuild(image=1)
+    cs.assert_called('POST', '/servers/1234/action')
+    cs.servers.rebuild(s, image=1)
+    cs.assert_called('POST', '/servers/1234/action')
+    
+def test_resize_server():
+    s = cs.servers.get(1234)
+    s.resize(flavor=1)
+    cs.assert_called('POST', '/servers/1234/action')
+    cs.servers.resize(s, flavor=1)
+    cs.assert_called('POST', '/servers/1234/action')
+    
+def test_confirm_resized_server():
+    s = cs.servers.get(1234)
+    s.confirm_resize()
+    cs.assert_called('POST', '/servers/1234/action')
+    cs.servers.confirm_resize(s)
+    cs.assert_called('POST', '/servers/1234/action')
+    
+def test_revert_resized_server():
+    s = cs.servers.get(1234)
+    s.revert_resize()
+    cs.assert_called('POST', '/servers/1234/action')
+    cs.servers.revert_resize(s)
+    cs.assert_called('POST', '/servers/1234/action')
