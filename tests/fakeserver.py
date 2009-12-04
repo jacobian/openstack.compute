@@ -17,9 +17,14 @@ from .utils import fail, assert_in, assert_not_in, assert_has_keys
 class FakeServer(CloudServers):
     def __init__(self):
         super(FakeServer, self).__init__('username', 'apikey')
-        self.client = FakeClient('username', 'apikey')
+        self.client = FakeClient()
 
 class FakeClient(CloudServersClient):
+    def __init__(self):
+        self.username = 'username'
+        self.apikey = 'apikey'
+        self.callstack = []
+    
     def _cs_request(self, url, method, **kwargs):
         # Check that certain things are called correctly
         if method in ['GET', 'DELETE']:
@@ -33,9 +38,21 @@ class FakeClient(CloudServersClient):
         if not hasattr(self, callback):
             fail('Called unknown API method: %s %s' % (method, url))
         
+        # Note the call
+        self.callstack.append((method, url))
+        
         status, body = getattr(self, callback)(**kwargs)        
         return httplib2.Response({"status": status}), body
 
+    #
+    # Asserts
+    #
+    def assert_called(self, method, url):
+        """
+        Assert than an API method was just called.
+        """
+        nt.assert_equal(self.callstack[-1], (method, url),
+                        'Expected %s %s; got %s %s' % (self.callstack[-1],) + (method, url))
     #
     # Limits
     # 

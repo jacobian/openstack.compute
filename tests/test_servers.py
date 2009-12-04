@@ -27,9 +27,18 @@ def test_create_server():
     
 def test_update_server():
     s = cs.servers.get(1234)
+    
+    # Update via instance
+    s.update(name='hi')
+    s.update(name='hi', password='there')
+    
+    # Silly, but not an error
+    s.update()
+    
+    # Update via manager
     cs.servers.update(s, name='hi')
     cs.servers.update(1234, password='there')
     cs.servers.update(s, name='hi', password='there')
-
+    
 def test_delete_server():
     cs.servers.delete(1234)

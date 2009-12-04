@@ -3,6 +3,12 @@ from . import base
 class Server(base.Resource):
     def __repr__(self):
         return "<Server: %s>" % self.name
+        
+    def delete(self):
+        self.manager.delete(self)
+        
+    def update(self, name=None, password=None):
+        self.manager.update(self, name, password)
     
 class ServerManager(base.Manager):
     resource_class = Server
