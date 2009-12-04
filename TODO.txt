@@ -1,6 +1,3 @@
-* Resources should have methods (update/save/delete) instead of having to go back through the manager (api.images.delete(image) sucks wrt image.delete())
-* support the files to creating servers ("personality")
-* Use base.getid everywhere
 * Docstrings
 * Docs
-* Finish tests
+* support the files to creating servers ("personality")

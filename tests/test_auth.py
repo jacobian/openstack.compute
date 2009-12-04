@@ -35,3 +35,4 @@ def test_auth_automatic():
             client.get('/')
             mock_authenticate.assert_called()
             mock_request.assert_called()
+            
