@@ -19,6 +19,13 @@ class FakeServer(CloudServers):
         super(FakeServer, self).__init__('username', 'apikey')
         self.client = FakeClient()
 
+    def assert_called(self, method, url):
+        """
+        Assert than an API method was just called.
+        """
+        nt.assert_equal(self.client.callstack[-1], (method, url),
+                        'Expected %s %s; got %s %s' % (self.client.callstack[-1] + (method, url)))
+
 class FakeClient(CloudServersClient):
     def __init__(self):
         self.username = 'username'
@@ -44,15 +51,6 @@ class FakeClient(CloudServersClient):
         status, body = getattr(self, callback)(**kwargs)        
         return httplib2.Response({"status": status}), body
 
-    #
-    # Asserts
-    #
-    def assert_called(self, method, url):
-        """
-        Assert than an API method was just called.
-        """
-        nt.assert_equal(self.callstack[-1], (method, url),
-                        'Expected %s %s; got %s %s' % (self.callstack[-1],) + (method, url))
     #
     # Limits
     # 
