@@ -303,17 +303,17 @@ class FakeClient(CloudServersClient):
     #
     def get_shared_ip_groups(self, **kw):
         return (200, {'sharedIpGroups': [
-            {'id': 1234, 'name': 'Shared IP Group 1'},
-            {'id': 5678, 'name': 'Shared IP Group 2'},
+            {'id': 1, 'name': 'Shared IP Group 1'},
+            {'id': 2, 'name': 'Shared IP Group 2'},
         ]})
         
     def get_shared_ip_groups_detail(self, **kw):
         return (200, {'sharedIpGroups': [
-            {'id': 1234, 'name': 'Shared IP Group 1', 'servers': [1234]},
-            {'id': 5678, 'name': 'Shared IP Group 2', 'servers': [5678]},
+            {'id': 1, 'name': 'Shared IP Group 1', 'servers': [1234]},
+            {'id': 2, 'name': 'Shared IP Group 2', 'servers': [5678]},
         ]})
         
-    def get_shared_ip_group_1234(self, **kw):
+    def get_shared_ip_groups_1(self, **kw):
         return (200, {'sharedIpGroup': self.get_shared_ip_groups_detail()[1]['sharedIpGroups'][0]})
 
     def post_shared_ip_groups(self, body, **kw):
@@ -325,5 +325,5 @@ class FakeClient(CloudServersClient):
             'servers': [body['sharedIpGroup']['server']]
         }})
         
-    def delete_shared_ip_groups_1234(self, **kw):
+    def delete_shared_ip_groups_1(self, **kw):
         return (204, None)

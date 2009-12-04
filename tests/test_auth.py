@@ -25,3 +25,13 @@ def test_authenticate_failure():
     mock_request = mock.Mock(return_value=(auth_response, None))
     with mock.patch_object(httplib2.Http, "request", mock_request):
         assert_raises(cloudservers.exceptions.Unauthorized, cs.client.authenticate)
+        
+def test_auth_automatic():
+    client = cloudservers.CloudServers("username", "apikey").client
+    client.management_url = ''
+    mock_request = mock.Mock(return_value=(None, None))
+    with mock.patch_object(client, 'request', mock_request):
+        with mock.patch_object(client, 'authenticate') as mock_authenticate:
+            client.get('/')
+            mock_authenticate.assert_called()
+            mock_request.assert_called()

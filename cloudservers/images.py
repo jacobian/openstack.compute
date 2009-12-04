@@ -14,8 +14,7 @@ class ImageManager(base.Manager):
         return self._list("/images/detail", "images")
     
     def create(self, name, server):
-        server_id = getattr(server, "id", int(server))
-        data = {"image": {"serverId": server_id, "name": name}}
+        data = {"image": {"serverId": base.getid(server), "name": name}}
         return self._create("/images", data, "image")
         
     def delete(self, image):
