@@ -27,7 +27,7 @@ def test_create_server():
     )
     cs.assert_called('POST', '/servers')
     assert_isinstance(s, Server)
-    
+
 def test_update_server():
     s = cs.servers.get(1234)
     
@@ -49,7 +49,12 @@ def test_update_server():
     cs.assert_called('PUT', '/servers/1234')
     
 def test_delete_server():
+    s = cs.servers.get(1234)
+    s.delete()
+    cs.assert_called('DELETE', '/servers/1234')
     cs.servers.delete(1234)
+    cs.assert_called('DELETE', '/servers/1234')
+    cs.servers.delete(s)
     cs.assert_called('DELETE', '/servers/1234')
     
 def test_share_ip():
