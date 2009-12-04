@@ -11,32 +11,32 @@ class ServerManager(base.Manager):
         return self._get("/servers/%s" % base.getid(server), "server")
         
     def list(self):
-        return self._list("/servers/details", "servers")
+        return self._list("/servers/detail", "servers")
         
     def create(self, name, image, flavor, ipgroup=None, meta=None, files=None):
-        data = {"server": {
+        body = {"server": {
             "name": name,
             "imageId": base.getid(image),
             "flavorId": base.getid(flavor),
         }}
         if ipgroup:
-            data["server"]["ipgroup"] = base.getid(ipgroup)
+            body["server"]["sharedIpGroupId"] = base.getid(ipgroup)
         if meta:
-            data["server"]["metadata"] = meta
+            body["server"]["metadata"] = meta
         if files:
             raise NotImplementedError
             
-        return self._create("/servers", "server")
+        return self._create("/servers", body, "server")
         
     def update(self, server, name=None, password=None):
         if name is None and password is None:
             return
-        data = {"server": {}}
+        body = {"server": {}}
         if name:
-            data["server"]["name"] = name
+            body["server"]["name"] = name
         if password:
-            data["server"]["password"] = password
-        return self._update("/servers/%s" % base.getid(server), data, "server")
+            body["server"]["adminPass"] = password
+        self._update("/servers/%s" % base.getid(server), body)
         
     def delete(self, server):
         self._delete("/servers/%s" % base.getid(server))

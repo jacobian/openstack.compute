@@ -9,28 +9,26 @@ class Manager(object):
     """
     resource_class = None
     
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, api):
+        self.api = api
         
     def _list(self, url, response_key):
-        resp, body = self.client.get(url)
+        resp, body = self.api.client.get(url)
         return [self.resource_class(self, res) for res in body[response_key]]
     
     def _get(self, url, response_key):
-        resp, body = self.client.get(url)
+        resp, body = self.api.client.get(url)
         return self.resource_class(self, body[response_key])
     
-    def _create(self, url, data, response_key):
-        resp, body = self.client.post(url, data=data)
+    def _create(self, url, body, response_key):
+        resp, body = self.api.client.post(url, body=body)
         return self.resource_class(self, body[response_key])
         
     def _delete(self, url):
-        resp, body = self.client.delete(url)
+        resp, body = self.api.client.delete(url)
     
-    def _update(self, url, data, response_key):
-        resp, body = self.client.put(url, data=data)
-        return self.resource_class(self, body[response_key])
-    
+    def _update(self, url, body):
+        resp, body = self.api.client.put(url, body=body)    
 class Resource(object):
     """
     A resource represents a particular instance of an object (server, flavor,

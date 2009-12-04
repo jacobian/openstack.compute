@@ -9,26 +9,31 @@ behavior differs from the spec.
 from __future__ import absolute_import
 
 import httplib2
-from nose.tools import *
+import nose.tools as nt
+from cloudservers import CloudServers
 from cloudservers.client import CloudServersClient
-from .utils import *
+from .utils import fail, assert_in, assert_not_in, assert_has_keys
+
+class FakeServer(CloudServers):
+    def __init__(self):
+        super(FakeServer, self).__init__('username', 'apikey')
+        self.client = FakeClient('username', 'apikey')
 
 class FakeClient(CloudServersClient):
     def _cs_request(self, url, method, **kwargs):
         # Check that certain things are called correctly
         if method in ['GET', 'DELETE']:
-            assert_('body' not in kwargs, "%s %s has an unexpected body" % (method, url))
-        if method in ['PUT', 'DELETE']:
-            assert_('body' in kwargs, "%s %s is missing a body" % (method, body))
+            assert_not_in('body', kwargs)
+        elif method in ['PUT', 'POST']:
+            assert_in('body', kwargs)
         
         # Call the method
         munged_url = url.strip('/').replace('/', '_').replace('.', '_')
         callback = "%s_%s" % (method.lower(), munged_url)
-        try:
-            status, body = getattr(self, callback)(**kwargs)
-        except AttributeError:
-            assert_(False, 'Called unknown API method: %s %s' % (method, url))
+        if not hasattr(self, callback):
+            fail('Called unknown API method: %s %s' % (method, url))
         
+        status, body = getattr(self, callback)(**kwargs)        
         return httplib2.Response({"status": status}), body
 
     #
@@ -100,7 +105,7 @@ class FakeClient(CloudServersClient):
             {'id': 5678, 'name': 'sample-server2'}
         ]})
         
-    def get_servers_details(self, **kw):
+    def get_servers_detail(self, **kw):
         return (200, {"servers" : [
             {
                 "id" : 1234,
@@ -136,19 +141,19 @@ class FakeClient(CloudServersClient):
             }
         ]})
         
-    def post_severs(self, body, **kw):
-        assert_equal(body.keys(), ['server'])
+    def post_servers(self, body, **kw):
+        nt.assert_equal(body.keys(), ['server'])
         assert_has_keys(body['server'], 
-                        expected = ['name', 'imageId', 'flavorId'],
+                        required = ['name', 'imageId', 'flavorId'],
                         optional = ['sharedIpGroupId', 'metadata', 'personality'])
-        return (202, None)
+        return (202, self.get_servers_1234()[1])
         
     def get_servers_1234(self, **kw):
-        r = {'server': self.get_servers_details()[0]['servers'[0]]}
+        r = {'server': self.get_servers_detail()[1]['servers'][0]}
         return (200, r)
 
     def put_servers_1234(self, body, **kw):
-        assert_equal(body.keys(), ['server'])
+        nt.assert_equal(body.keys(), ['server'])
         assert_has_keys(body['server'], optional=['name', 'adminPass'])
         return (204, None)
             
@@ -160,16 +165,16 @@ class FakeClient(CloudServersClient):
     #
     
     def get_servers_1234_ips(self, **kw):
-        return (200, {'addresses': self.get_servers_1234()[0]['server']['addresses']})
+        return (200, {'addresses': self.get_servers_1234()[1]['server']['addresses']})
             
     def get_servers_1234_ips_public(self, **kw):
-        return (200, {'public': self.get_servers_1234_ips()[0]['addresses']['public']})
+        return (200, {'public': self.get_servers_1234_ips()[1]['addresses']['public']})
         
     def get_servers_1234_ips_private(self, **kw):
-        return (200, {'private': self.get_servers_1234_ips()[0]['addresses']['private']})
+        return (200, {'private': self.get_servers_1234_ips()[1]['addresses']['private']})
     
     def put_servers_1234_ips_public_1_2_3_4(self, body, **kw):
-        assert_equal(body.keys(), ['shareIp'])
+        nt.assert_equal(body.keys(), ['shareIp'])
         assert_has_keys(body, required=['sharedGroupId', 'configureServer'])
         return (202, None)
     
@@ -181,23 +186,23 @@ class FakeClient(CloudServersClient):
     #
     
     def post_servers_1234_action(self, body, **kw):
-        assert_equal(len(body.keys()), 1)
+        nt.assert_equal(len(body.keys()), 1)
         action = body.keys()[0]
         if action == 'reboot':
-            assert_equal(body[action].keys(), ['type'])
+            nt.assert_equal(body[action].keys(), ['type'])
             assert_in(body[action]['type'], ['HARD', 'SOFT'])
         elif action == 'rebuild':
-            assert_equal(body[action].keys(), ['imageId'])
+            nt.assert_equal(body[action].keys(), ['imageId'])
         elif action == 'resize':
-            assert_equal(body[action].keys(), ['flavorId'])
+            nt.assert_equal(body[action].keys(), ['flavorId'])
         elif action == 'confirmResize':
-            assert_equal(body[action], None)
+            nt.assert_equal(body[action], None)
             # This one method returns a different response code
             return (204, None)
         elif action == 'revertResize':
-            assert_equal(body[action], None)
+            nt.assert_equal(body[action], None)
         else:
-            assert_(False, "Unexpected server action: %s" % action)
+            nt.assert_(False, "Unexpected server action: %s" % action)
         return (202, None)
         
     #
@@ -210,14 +215,14 @@ class FakeClient(CloudServersClient):
             {'id': 2, 'name': '512 MB Server'}
         ]})
         
-    def get_flavors_details(self, **kw):
+    def get_flavors_detail(self, **kw):
         return (200, {'flavors': [
             {'id': 1, 'name': '256 MB Server', 'ram': 256, 'disk': 10},
             {'id': 2, 'name': '512 MB Server', 'ram': 512, 'disk': 20}
         ]})
         
     def get_flavors_1(self, **kw):
-        return (200, {'flavor': self.get_flavors_details()[0]['flavors'][0]})
+        return (200, {'flavor': self.get_flavors_detail()[1]['flavors'][0]})
     
     #
     # Images
@@ -248,15 +253,15 @@ class FakeClient(CloudServersClient):
             }
         ]})
         
-    def get_image_1(self, **kw):
-        return (200, {'image': self.get_flavors_details()[0]['images'][0]})
+    def get_images_1(self, **kw):
+        return (200, {'image': self.get_images_detail()[1]['images'][0]})
         
     def post_images(self, body, **kw):
-        assert_equal(body.keys(), ['image'])
-        assert_has_keys(body['image'], requred=['serverId', 'name'])
-        return (202, None)
+        nt.assert_equal(body.keys(), ['image'])
+        assert_has_keys(body['image'], required=['serverId', 'name'])
+        return (202, self.get_images_1()[1])
         
-    def delete_image_1(self, **kw):
+    def delete_images_1(self, **kw):
         return (204, None)
     
     #
@@ -264,13 +269,13 @@ class FakeClient(CloudServersClient):
     #
     def get_servers_1234_backup_schedule(self, **kw):
         return (200, {"backupSchedule" : {
-            "enabled" : true,
+            "enabled" : True,
             "weekly" : "THURSDAY",
             "daily" : "H_0400_0600"
         }})
         
     def post_servers_1234_backup_schedule(self, body, **kw):
-        assert_equal(body.keys(), ['backupSchedule'])
+        nt.assert_equal(body.keys(), ['backupSchedule'])
         assert_has_keys(body['backupSchedule'], required=['enabled'], optional=['weekly', 'daily'])
         return (204, None)
         
@@ -282,21 +287,21 @@ class FakeClient(CloudServersClient):
     #
     def get_shared_ip_groups(self, **kw):
         return (200, {'sharedIpGroups': [
-            {'id': 1234, name: 'Shared IP Group 1'},
-            {'id': 5678, name: 'Shared IP Group 2'},
+            {'id': 1234, 'name': 'Shared IP Group 1'},
+            {'id': 5678, 'name': 'Shared IP Group 2'},
         ]})
         
     def get_shared_ip_groups_detail(self, **kw):
         return (200, {'sharedIpGroups': [
-            {'id': 1234, name: 'Shared IP Group 1', 'servers': [1234]},
-            {'id': 5678, name: 'Shared IP Group 2', 'servers': [5678]},
+            {'id': 1234, 'name': 'Shared IP Group 1', 'servers': [1234]},
+            {'id': 5678, 'name': 'Shared IP Group 2', 'servers': [5678]},
         ]})
         
     def get_shared_ip_group_1234(self, **kw):
-        return (200, {'sharedIpGroup': self.get_shared_ip_groups_detail()[0]['sharedIpGroups'][0]})
+        return (200, {'sharedIpGroup': self.get_shared_ip_groups_detail()[1]['sharedIpGroups'][0]})
 
     def post_shared_ip_groups(self, body, **kw):
-        assert_equal(body.keys(), ['sharedIpGroup'])
+        nt.assert_equal(body.keys(), ['sharedIpGroup'])
         assert_has_keys(body['sharedIpGroup'], required=['name', 'server'])
         return (201, {'sharedIpGroup': {
             'id': 10101,
