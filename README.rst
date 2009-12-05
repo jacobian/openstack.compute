@@ -22,3 +22,14 @@ In the meantime::
     >>> s.delete()
     
 Or, from the shell, try ``cloudservers help``.
+
+FAQ
+===
+
+What's wrong with libcloud?
+
+    Nothing! However, as a cross-service binding it's by definition lowest
+    common denominator; I needed access to the Rackspace-specific APIs (shared
+    IP groups, image snapshots, resizing, etc.). I also wanted a command-line
+    utility.
+    
