@@ -4,6 +4,7 @@ try:
 except ImportError:
     import simplejson as json
 
+import cloudservers
 from . import exceptions
 
 class CloudServersClient(httplib2.Http):
@@ -22,8 +23,10 @@ class CloudServersClient(httplib2.Http):
         self.force_exception_to_status_code = True
 
     def request(self, *args, **kwargs):
+        kwargs.setdefault('headers', {})
+        kwargs['headers']['User-Agent'] = 'python-cloudservers/%s' % cloudservers.__version__
         if 'body' in kwargs:
-            kwargs.setdefault('headers', {})['Content-Type'] = 'application/json'
+            kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['body'] = json.dumps(kwargs['body'])
             
         resp, body = super(CloudServersClient, self).request(*args, **kwargs)

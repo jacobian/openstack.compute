@@ -1,3 +1,5 @@
+__all__ = ['CloudServersException', 'BadRequest', 'Unauthorized', 'Forbidden', 'NotFound', 'OverLimit']
+
 class CloudServersException(Exception):
     def __init__(self, code, message=None, details=None):
         self.code = code
@@ -42,6 +44,9 @@ def from_response(response, body):
     """
     cls = _code_map.get(response.status, CloudServersException)
     if body:
-        return cls(**body['cloudServersFault'])
+        error = body[body.keys()[0]]
+        return cls(code=response.status, 
+                   message=error.get('message', None),
+                   details=error.get('details', None))
     else:
         return cls(code=response.status)

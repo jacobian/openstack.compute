@@ -5,6 +5,9 @@ from .flavors import FlavorManager, Flavor
 from .images import ImageManager, Image
 from .servers import ServerManager, Server
 from .ipgroups import IPGroupManager, IPGroup
+from .exceptions import *
+
+__version__ = ('1.0a1')
 
 class CloudServers(object):
     def __init__(self, username, apikey):
@@ -13,3 +16,6 @@ class CloudServers(object):
         self.images = ImageManager(self)
         self.servers = ServerManager(self)
         self.ipgroups = IPGroupManager(self)
+        
+    def authenticate(self):
+        self.client.authenticate()

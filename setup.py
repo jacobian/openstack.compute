@@ -16,7 +16,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    install_requires = ['httplib2', 'argparse'],
+    install_requires = ['httplib2', 'cmdln', 'prettytable'],
     
     tests_require = ["nose", "mock"],
     test_suite = "nose.collector",
