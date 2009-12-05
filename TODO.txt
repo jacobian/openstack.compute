@@ -1,8 +1,18 @@
-* Docstrings
-* Docs
-* The aggressive caching makes stuff *very* annoying -- it's not clear at all that commands have been accepted. Is there any way to disable caching?
-* Shell commands should take server names, flavor sizes, etc, which means resources need some sort of get-by-identifier method.
+* Finish docstrings
+* Write docs
+
+--- release 1.0 alpha
+
+* Shell commands should take server names, flavor sizes, etc, which means
+  resources need some sort of get-by-identifier method.
 * Finish shell API.
-* Test coverage for shell API?
+
+-- release 1.0 beta
+
+* Test coverage for shell API
 * support the files to creating servers ("personality")
 * Much better error handling in the shell.
+* The aggressive caching makes stuff *very* annoying -- it's not clear at all
+  that commands have been accepted. Is there any way to disable caching?
+
+--- release 1.0 final
