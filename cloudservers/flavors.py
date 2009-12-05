@@ -10,5 +10,5 @@ class FlavorManager(base.Manager):
     def list(self):
         return self._list("/flavors/detail", "flavors")
         
-    def get(self, id):
-        return self._get("/flavors/%s" % id, "flavor")
+    def get(self, flavor):
+        return self._get("/flavors/%s" % base.getid(flavor), "flavor")
