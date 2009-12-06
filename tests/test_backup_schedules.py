@@ -21,6 +21,10 @@ def test_get_backup_schedule():
     assert_isinstance(s.backup_schedule, BackupSchedule)
     cs.assert_called('GET', '/servers/1234/backup_schedule')
     
+    # Just for coverage's sake
+    b = s.backup_schedule.get()
+    cs.assert_called('GET', '/servers/1234/backup_schedule')
+    
 def test_create_update_backup_schedule():
     s = cs.servers.get(1234)
     
