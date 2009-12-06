@@ -24,21 +24,42 @@ BACKUP_DAILY_H_2000_2200 = 'H_2000_2200'
 BACKUP_DAILY_H_2200_0000 = 'H_2200_0000'
 
 class BackupSchedule(base.Resource):
+    """
+    Represents the daily or weekly backup schedule for some server.
+    """
     def get(self):
+        """
+        Get this `BackupSchedule` again from the API.
+        """
         return self.manager.get(server=self.server)
     
     def delete(self):
+        """
+        Delete (i.e. disable and remove) this scheduled backup.
+        """
         self.manager.delete(server=self.server)
     
-    def create(self, **kw):
-        self.manager.create(self.server, **kw)
+    def update(self, enabled=True, weekly=BACKUP_WEEKLY_DISABLED, daily=BACKUP_DAILY_DISABLED):
+        """
+        Update this backup schedule. 
         
-    update = create
+        See :meth:`BackupScheduleManager.create` for details.
+        """
+        self.manager.create(self.server, enabled, weekly, daily)
     
 class BackupScheduleManager(base.Manager):
+    """
+    Manage server backup schedules.
+    """
     resource_class = BackupSchedule
     
     def get(self, server):
+        """
+        Get the current backup schedule for a server.
+        
+        :arg server: The server (or its ID).
+        :rtype: :class:`BackupSchedule`
+        """
         s = base.getid(server)
         schedule = self._get('/servers/%s/backup_schedule' % s, 'backupSchedule')
         schedule.server = server
@@ -49,6 +70,14 @@ class BackupScheduleManager(base.Manager):
     # nice little helper methods.
     
     def create(self, server, enabled=True, weekly=BACKUP_WEEKLY_DISABLED, daily=BACKUP_DAILY_DISABLED):
+        """
+        Create or update the backup schedule for the given server.
+        
+        :arg server: The server (or its ID).
+        :arg enabled: boolean; should this schedule be enabled?
+        :arg weekly: Run a weekly backup on this day (one of the `BACKUP_WEEKLY_*` constants)
+        :arg daily: Run a daily backup at this time (one of the `BACKUP_DAILY_*` constants)
+        """
         s = base.getid(server)
         body = {'backupSchedule': {
             'enabled': enabled, 'weekly': weekly, 'daily': daily
@@ -58,5 +87,10 @@ class BackupScheduleManager(base.Manager):
     update = create
     
     def delete(self, server):
+        """
+        Remove the scheduled backup for `server`.
+        
+        :arg server: The server (or its ID).
+        """
         s = base.getid(server)
         self._delete('/servers/%s/backup_schedule' % s)

@@ -22,6 +22,23 @@ from .ipgroups import IPGroupManager, IPGroup
 from .servers import ServerManager, Server, REBOOT_HARD, REBOOT_SOFT
 
 class CloudServers(object):
+    """
+    Top-level object to access the Rackspace Cloud Servers API.
+    
+    Create an instance with your creds::
+    
+        >>> cs = CloudServers(USERNAME, API_KEY)
+        
+    The call methods::
+    
+        >>> cs.servers.list()
+        ...
+        >>> cs.flavors.list()
+        ...
+        
+    &c.
+    """
+    
     def __init__(self, username, apikey):
         self.backup_schedules = BackupScheduleManager(self)
         self.client = CloudServersClient(username, apikey)
@@ -31,4 +48,13 @@ class CloudServers(object):
         self.servers = ServerManager(self)
         
     def authenticate(self):
+        """
+        Authenticate against the server.
+        
+        Normally this is called automatically when you first access the API,
+        but you can call this method to force authentication right now.
+        
+        Returns on success; raises :class:`cloudservers.Unauthorized` if the
+        credentials are wrong.
+        """
         self.client.authenticate()
