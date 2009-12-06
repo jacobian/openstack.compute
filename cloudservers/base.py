@@ -60,6 +60,13 @@ class Resource(object):
         new = self.manager.get(self.id)
         self._add_details(new._info)
         
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        if hasattr(self, 'id') and hasattr(other, 'id'):
+            return self.id == other.id
+        return self._info == other._info
+
 def getid(obj):
     """
     Abstracts the common pattern of allowing both an object or an object's ID
