@@ -1,6 +1,6 @@
 from . import base
 
-SOFT, HARD = 'SOFT', 'HARD'
+REBOOT_SOFT, REBOOT_HARD = 'SOFT', 'HARD'
 
 class Server(base.Resource):
     def __repr__(self):
@@ -24,7 +24,7 @@ class Server(base.Resource):
         """
         self.manager.unshare_ip(self, address)
     
-    def reboot(self, type=SOFT):
+    def reboot(self, type=REBOOT_SOFT):
         self.manager.reboot(self)
         
     def rebuild(self, image):
@@ -38,6 +38,10 @@ class Server(base.Resource):
         
     def revert_resize(self):
         self.manager.revert_resize(self)
+    
+    @property
+    def backup_schedule(self):
+        return self.manager.api.backup_schedules.get(self)
     
 class ServerManager(base.Manager):
     resource_class = Server
@@ -98,7 +102,7 @@ class ServerManager(base.Manager):
         """
         self.api.client.post('/servers/%s/action' % base.getid(server), body={action: info})
     
-    def reboot(self, server, type=SOFT):
+    def reboot(self, server, type=REBOOT_SOFT):
         self._action('reboot', server, {'type':type})
         
     def rebuild(self, server, image):
