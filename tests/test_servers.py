@@ -1,7 +1,8 @@
-from cloudservers import Server
+import StringIO
+import nose.tools as nt
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
-import nose.tools as nt
+from cloudservers import Server
 
 cs = FakeServer()
 
@@ -24,6 +25,10 @@ def test_create_server():
         flavor = 1,
         meta = {'foo': 'bar'},
         ipgroup = 1,
+        files = {
+            '/etc/passwd': 'some data',                 # a file
+            '/tmp/foo.txt': StringIO.StringIO('data')   # a stream
+        }
     )
     cs.assert_called('POST', '/servers')
     assert_isinstance(s, Server)

@@ -162,6 +162,9 @@ class FakeClient(CloudServersClient):
         assert_has_keys(body['server'], 
                         required = ['name', 'imageId', 'flavorId'],
                         optional = ['sharedIpGroupId', 'metadata', 'personality'])
+        if 'personality' in body['server']:
+            for pfile in body['server']['personality']:
+                assert_has_keys(pfile, required=['path', 'contents'])
         return (202, self.get_servers_1234()[1])
         
     def get_servers_1234(self, **kw):

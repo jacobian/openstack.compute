@@ -62,8 +62,22 @@ class ServerManager(base.Manager):
             body["server"]["sharedIpGroupId"] = base.getid(ipgroup)
         if meta:
             body["server"]["metadata"] = meta
+        
+        # Files are a slight bit tricky. They're passed in a "personality"
+        # list to the POST. Each item is a dict giving a file name and the
+        # base64-encoded contents of the file. We want to allow passing
+        # either an open file *or* some contents as files here.
         if files:
-            raise NotImplementedError
+            personality = body['server']['personality'] = []
+            for filepath, file_or_string in files.items():
+                if hasattr(file_or_string, 'read'):
+                    data = file_or_string.read()
+                else:
+                    data = file_or_string
+                personality.append({
+                    'path': filepath,
+                    'contents': data.encode('base64'),
+                })
             
         return self._create("/servers", body, "server")
         
