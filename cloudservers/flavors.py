@@ -4,7 +4,7 @@ class Flavor(base.Resource):
     def __repr__(self):
         return "<Flavor: %s>" % self.name
 
-class FlavorManager(base.Manager):
+class FlavorManager(base.ManagerWithFind):
     resource_class = Flavor
     
     def list(self):

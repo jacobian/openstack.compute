@@ -25,3 +25,12 @@ def test_create_image():
 def test_delete_image():
     cs.images.delete(1)
     cs.assert_called('DELETE', '/images/1')
+    
+def test_find():
+    i = cs.images.find(name="CentOS 5.2")
+    nt.assert_equal(i.id, 1)
+    cs.assert_called('GET', '/images/detail')
+    
+    iml = cs.images.findall(status='SAVING')
+    nt.assert_equal(len(iml), 1)
+    nt.assert_equal(iml[0].name, 'My Server Backup')

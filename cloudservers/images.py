@@ -4,7 +4,7 @@ class Image(base.Resource):
     def __repr__(self):
         return "<Image: %s>" % self.name
 
-class ImageManager(base.Manager):
+class ImageManager(base.ManagerWithFind):
     resource_class = Image
     
     def get(self, id):

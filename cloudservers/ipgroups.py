@@ -7,7 +7,7 @@ class IPGroup(base.Resource):
     def delete(self):
         self.manager.delete(self)
 
-class IPGroupManager(base.Manager):
+class IPGroupManager(base.ManagerWithFind):
     resource_class = IPGroup
     
     def list(self):

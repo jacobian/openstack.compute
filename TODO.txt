@@ -3,8 +3,7 @@
 
 --- release 1.0 alpha
 
-* Shell commands should take server names, flavor sizes, etc, which means
-  resources need some sort of get-by-identifier method.
+* Shell commands should take server names, flavor sizes, etc.
 * Finish shell API.
 
 -- release 1.0 beta

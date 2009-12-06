@@ -62,6 +62,17 @@ def test_delete_server():
     cs.servers.delete(s)
     cs.assert_called('DELETE', '/servers/1234')
     
+def test_find():
+    s = cs.servers.find(name='sample-server')
+    cs.assert_called('GET', '/servers/detail')
+    nt.assert_equal(s.name, 'sample-server')
+    
+    # Find with multiple results arbitraility returns the first item
+    s = cs.servers.find(flavorId=1)
+    sl = cs.servers.findall(flavorId=1)
+    nt.assert_equal(sl[0], s)
+    nt.assert_equal([s.id for s in sl], [1234, 5678])
+    
 def test_share_ip():
     s = cs.servers.get(1234)
     

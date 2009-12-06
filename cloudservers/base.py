@@ -11,7 +11,7 @@ class Manager(object):
     
     def __init__(self, api):
         self.api = api
-        
+
     def _list(self, url, response_key):
         resp, body = self.api.client.get(url)
         return [self.resource_class(self, res) for res in body[response_key]]
@@ -30,6 +30,39 @@ class Manager(object):
     def _update(self, url, body):
         resp, body = self.api.client.put(url, body=body)
 
+class ManagerWithFind(Manager):
+    """
+    Like a `Manager`, but with additional `find()`/`findall()` methods.
+    """
+    def find(self, **kwargs):
+        """
+        Find a single item with attributes matching **kwargs.
+        
+        This isn't very efficient: it loads the entire list then
+        filters on the Python side.
+        """
+        rl = self.findall(**kwargs)
+        return rl and rl[0] or None
+        
+    def findall(self, **kwargs):
+        """
+        Find all items with attributes matching **kwargs.
+        
+        This isn't very efficient: it loads the entire list then filters on
+        the Python side.
+        """
+        found = []
+        searches = kwargs.items()
+        
+        for obj in self.list():
+            try:
+                if all(getattr(obj, attr) == value for (attr, value) in searches):
+                    found.append(obj)
+            except AttributeError:
+                continue
+        
+        return found
+                    
 class Resource(object):
     """
     A resource represents a particular instance of an object (server, flavor,

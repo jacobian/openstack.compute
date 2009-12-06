@@ -43,7 +43,7 @@ class Server(base.Resource):
     def backup_schedule(self):
         return self.manager.api.backup_schedules.get(self)
     
-class ServerManager(base.Manager):
+class ServerManager(base.ManagerWithFind):
     resource_class = Server
     
     def get(self, server):
