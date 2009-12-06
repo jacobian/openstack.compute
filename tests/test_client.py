@@ -19,7 +19,7 @@ def test_get():
     with mock.patch_object(httplib2.Http, "request", mock_request):
         resp, body = cl.get("/hi")
         mock_request.assert_called_with("http://example.com/hi", "GET", 
-            headers={"X-Auth-Token": "token"})
+            headers={"X-Auth-Token": "token", "User-Agent": cl.USER_AGENT})
         # Automatic JSON parsing
         assert_equal(body, {"hi":"there"})
 
@@ -28,6 +28,9 @@ def test_post():
     with mock.patch_object(httplib2.Http, "request", mock_request):
         cl.post("/hi", body=[1, 2, 3])
         mock_request.assert_called_with("http://example.com/hi", "POST", 
-            headers={"X-Auth-Token": "token", "Content-Type": "application/json"},
-            body='[1, 2, 3]'
+            headers = {
+                "X-Auth-Token": "token",
+                "Content-Type": "application/json",
+                "User-Agent": cl.USER_AGENT},
+            body = '[1, 2, 3]'
         )

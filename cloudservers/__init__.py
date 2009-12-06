@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
+__version__ = ('1.0a1')
+
 from .client import CloudServersClient
 from .flavors import FlavorManager, Flavor
 from .images import ImageManager, Image
 from .servers import ServerManager, Server
 from .ipgroups import IPGroupManager, IPGroup
 from .exceptions import *
-
-__version__ = ('1.0a1')
 
 class CloudServers(object):
     def __init__(self, username, apikey):

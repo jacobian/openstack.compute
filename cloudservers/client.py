@@ -10,6 +10,7 @@ from . import exceptions
 class CloudServersClient(httplib2.Http):
     
     AUTH_URL = 'https://auth.api.rackspacecloud.com/v1.0'
+    USER_AGENT = 'python-cloudservers/%s' % cloudservers.__version__
     
     def __init__(self, user, apikey):
         super(CloudServersClient, self).__init__()
@@ -24,7 +25,7 @@ class CloudServersClient(httplib2.Http):
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('headers', {})
-        kwargs['headers']['User-Agent'] = 'python-cloudservers/%s' % cloudservers.__version__
+        kwargs['headers']['User-Agent'] = self.USER_AGENT
         if 'body' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['body'] = json.dumps(kwargs['body'])

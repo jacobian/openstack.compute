@@ -15,7 +15,11 @@ def test_authenticate_success():
     with mock.patch_object(httplib2.Http, "request", mock_request):
         cs.client.authenticate()
         mock_request.assert_called_with(cs.client.AUTH_URL, 'GET', 
-            headers={'X-Auth-User': 'username', 'X-Auth-Key': 'apikey'})
+            headers = {
+                'X-Auth-User': 'username',
+                'X-Auth-Key': 'apikey',
+                'User-Agent': cs.client.USER_AGENT
+            })
         assert_equal(cs.client.management_url, auth_response['x-server-management-url'])
         assert_equal(cs.client.auth_token, auth_response['x-auth-token'])
 
