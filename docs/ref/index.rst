@@ -5,3 +5,7 @@ Reference
    :maxdepth: 1
    
    backup_schedules
+   exceptions
+   flavors
+   images
+   

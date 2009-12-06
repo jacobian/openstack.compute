@@ -36,17 +36,17 @@ class ManagerWithFind(Manager):
     """
     def find(self, **kwargs):
         """
-        Find a single item with attributes matching **kwargs.
+        Find a single item with attributes matching ``**kwargs``.
         
-        This isn't very efficient: it loads the entire list then
-        filters on the Python side.
+        This isn't very efficient: it loads the entire list then filters on
+        the Python side.
         """
         rl = self.findall(**kwargs)
         return rl and rl[0] or None
         
     def findall(self, **kwargs):
         """
-        Find all items with attributes matching **kwargs.
+        Find all items with attributes matching ``**kwargs``.
         
         This isn't very efficient: it loads the entire list then filters on
         the Python side.
