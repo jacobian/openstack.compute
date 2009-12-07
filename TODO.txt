@@ -1,7 +1,4 @@
 * Write intro-level docs.
-
---- release 1.0 alpha
-
 * Finish shell API.
 * Shell commands should take server names, flavor sizes, etc.
 

@@ -4,3 +4,4 @@ distribute-*
 cover/
 pip-log.txt
 /.coverage
+/dist
