@@ -1,5 +1,5 @@
-Cloud Servers exceptions
-========================
+Exceptions
+==========
 
 .. currentmodule:: cloudservers
 

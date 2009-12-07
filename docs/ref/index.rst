@@ -8,4 +8,5 @@ Reference
    exceptions
    flavors
    images
-   
+   ipgroups
+   servers

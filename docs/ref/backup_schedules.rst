@@ -1,5 +1,5 @@
-Backup schedules reference
-==========================
+Backup schedules
+================
 
 .. currentmodule:: cloudservers
 

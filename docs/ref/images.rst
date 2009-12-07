@@ -1,5 +1,5 @@
-Image reference
-===============
+Images
+======
 
 .. currentmodule:: cloudservers
 

@@ -1,5 +1,5 @@
-Flavor reference
-================
+Flavors
+=======
 
 From Rackspace's API documentation:
 

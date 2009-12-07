@@ -29,7 +29,7 @@ class CloudServers(object):
     
         >>> cs = CloudServers(USERNAME, API_KEY)
         
-    The call methods::
+    Then call methods on its managers::
     
         >>> cs.servers.list()
         ...
