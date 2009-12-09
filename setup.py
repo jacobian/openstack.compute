@@ -1,4 +1,4 @@
-from distribute_setup import use_setuptools; use_setuptools()    
+from distribute_setup import use_setuptools; use_setuptools()
 from setuptools import setup, find_packages
 
 setup(
@@ -19,7 +19,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    install_requires = ['httplib2', 'cmdln', 'prettytable'],
+    install_requires = ['httplib2', 'argparse', 'prettytable'],
     
     tests_require = ["nose", "mock"],
     test_suite = "nose.collector",
