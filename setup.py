@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "python-cloudservers",
-    version = "1.0a1",
+    version = "1.0a2",
     description = "Client library for Rackspace's Cloud Servers API",
     url = 'http://packages.python.org/python-cloudservers',
     license = 'BSD',
