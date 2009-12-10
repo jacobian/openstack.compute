@@ -1,8 +1,7 @@
 import mock
 import httplib2
 from cloudservers.client import CloudServersClient
-from cloudservers import exceptions
-from nose.tools import *
+from nose.tools import assert_equal
 
 fake_response = httplib2.Response({"status": 200})
 fake_body = '{"hi": "there"}'

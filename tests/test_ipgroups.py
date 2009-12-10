@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from cloudservers import IPGroup
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
-import nose.tools as nt
+from nose.tools import assert_equal
 
 cs = FakeServer()
 
@@ -34,6 +34,6 @@ def test_delete_ipgroup():
 def test_find():
     ipg = cs.ipgroups.find(name='group1')
     cs.assert_called('GET', '/shared_ip_groups/detail')
-    nt.assert_equal(ipg.name, 'group1')
+    assert_equal(ipg.name, 'group1')
     ipgl = cs.ipgroups.findall(id=1)
-    nt.assert_equal(ipgl, [IPGroup(None, {'id': 1})])
+    assert_equal(ipgl, [IPGroup(None, {'id': 1})])

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from cloudservers import Flavor, NotFound
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
-import nose.tools as nt
+from nose.tools import assert_raises, assert_equal
 
 cs = FakeServer()
 
@@ -16,15 +16,15 @@ def test_get_flavor_details():
     f = cs.flavors.get(1)
     cs.assert_called('GET', '/flavors/1')
     assert_isinstance(f, Flavor)
-    nt.assert_equal(f.ram, 256)
-    nt.assert_equal(f.disk, 10)
+    assert_equal(f.ram, 256)
+    assert_equal(f.disk, 10)
     
 def test_find():
     f = cs.flavors.find(ram=256)
     cs.assert_called('GET', '/flavors/detail')
-    nt.assert_equal(f.name, '256 MB Server')
+    assert_equal(f.name, '256 MB Server')
     
     f = cs.flavors.find(disk=20)
-    nt.assert_equal(f.name, '512 MB Server')
+    assert_equal(f.name, '512 MB Server')
     
-    nt.assert_raises(NotFound, cs.flavors.find, disk=12345)
+    assert_raises(NotFound, cs.flavors.find, disk=12345)

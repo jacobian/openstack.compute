@@ -1,8 +1,7 @@
 import mock
 import cloudservers
-import cloudservers.exceptions
 import httplib2
-from nose.tools import *
+from nose.tools import assert_raises, assert_equal
 
 def test_authenticate_success():
     cs = cloudservers.CloudServers("username", "apikey")
@@ -28,7 +27,7 @@ def test_authenticate_failure():
     auth_response = httplib2.Response({'status': 401})
     mock_request = mock.Mock(return_value=(auth_response, None))
     with mock.patch_object(httplib2.Http, "request", mock_request):
-        assert_raises(cloudservers.exceptions.Unauthorized, cs.client.authenticate)
+        assert_raises(cloudservers.Unauthorized, cs.client.authenticate)
         
 def test_auth_automatic():
     client = cloudservers.CloudServers("username", "apikey").client

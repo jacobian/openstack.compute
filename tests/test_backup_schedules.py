@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from cloudservers.backup_schedules import *
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
-import nose.tools as nt
 
 cs = FakeServer()
 

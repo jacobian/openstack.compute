@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import StringIO
-import nose.tools as nt
+from nose.tools import assert_equal
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
 from cloudservers import Server
@@ -17,8 +17,8 @@ def test_get_server_details():
     s = cs.servers.get(1234)
     cs.assert_called('GET', '/servers/1234')
     assert_isinstance(s, Server)
-    nt.assert_equal(s.id, 1234)
-    nt.assert_equal(s.status, 'BUILD')
+    assert_equal(s.id, 1234)
+    assert_equal(s.status, 'BUILD')
     
 def test_create_server():
     s = cs.servers.create(
@@ -67,13 +67,13 @@ def test_delete_server():
 def test_find():
     s = cs.servers.find(name='sample-server')
     cs.assert_called('GET', '/servers/detail')
-    nt.assert_equal(s.name, 'sample-server')
+    assert_equal(s.name, 'sample-server')
     
     # Find with multiple results arbitraility returns the first item
     s = cs.servers.find(flavorId=1)
     sl = cs.servers.findall(flavorId=1)
-    nt.assert_equal(sl[0], s)
-    nt.assert_equal([s.id for s in sl], [1234, 5678])
+    assert_equal(sl[0], s)
+    assert_equal([s.id for s in sl], [1234, 5678])
     
 def test_share_ip():
     s = cs.servers.get(1234)

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from cloudservers import Image
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
-import nose.tools as nt
+from nose.tools import assert_equal
 
 cs = FakeServer()
 
@@ -16,8 +16,8 @@ def test_get_image_details():
     i = cs.images.get(1)
     cs.assert_called('GET', '/images/1')
     assert_isinstance(i, Image)
-    nt.assert_equal(i.id, 1)
-    nt.assert_equal(i.name, 'CentOS 5.2')
+    assert_equal(i.id, 1)
+    assert_equal(i.name, 'CentOS 5.2')
     
 def test_create_image():
     i = cs.images.create(server=1234, name="Just in case")
@@ -30,9 +30,9 @@ def test_delete_image():
     
 def test_find():
     i = cs.images.find(name="CentOS 5.2")
-    nt.assert_equal(i.id, 1)
+    assert_equal(i.id, 1)
     cs.assert_called('GET', '/images/detail')
     
     iml = cs.images.findall(status='SAVING')
-    nt.assert_equal(len(iml), 1)
-    nt.assert_equal(iml[0].name, 'My Server Backup')
+    assert_equal(len(iml), 1)
+    assert_equal(iml[0].name, 'My Server Backup')

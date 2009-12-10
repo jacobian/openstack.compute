@@ -9,7 +9,7 @@ behavior differs from the spec.
 from __future__ import absolute_import
 
 import httplib2
-import nose.tools as nt
+from nose.tools import assert_equal
 from cloudservers import CloudServers
 from cloudservers.client import CloudServersClient
 from .utils import fail, assert_in, assert_not_in, assert_has_keys
@@ -26,12 +26,12 @@ class FakeServer(CloudServers):
         expected = (method, url)
         called = self.client.callstack[-1][0:2]
 
-        nt.ok_(self.client.callstack, "Expected %s %s but no calls were made." % expected)
+        assert self.client.callstack, "Expected %s %s but no calls were made." % expected
         
-        nt.assert_equal(expected, called, 'Expected %s %s; got %s %s' % (expected + called))
+        assert expected == called, 'Expected %s %s; got %s %s' % (expected + called)
         
         if body is not None:
-            nt.assert_equal(self.client.callstack[-1][2], body)
+            assert_equal(self.client.callstack[-1][2], body)
         
         self.client.callstack = []
         
@@ -169,7 +169,7 @@ class FakeClient(CloudServersClient):
         ]})
         
     def post_servers(self, body, **kw):
-        nt.assert_equal(body.keys(), ['server'])
+        assert_equal(body.keys(), ['server'])
         assert_has_keys(body['server'], 
                         required = ['name', 'imageId', 'flavorId'],
                         optional = ['sharedIpGroupId', 'metadata', 'personality'])
@@ -183,7 +183,7 @@ class FakeClient(CloudServersClient):
         return (200, r)
 
     def put_servers_1234(self, body, **kw):
-        nt.assert_equal(body.keys(), ['server'])
+        assert_equal(body.keys(), ['server'])
         assert_has_keys(body['server'], optional=['name', 'adminPass'])
         return (204, None)
             
@@ -204,7 +204,7 @@ class FakeClient(CloudServersClient):
         return (200, {'private': self.get_servers_1234_ips()[1]['addresses']['private']})
     
     def put_servers_1234_ips_public_1_2_3_4(self, body, **kw):
-        nt.assert_equal(body.keys(), ['shareIp'])
+        assert_equal(body.keys(), ['shareIp'])
         assert_has_keys(body['shareIp'], required=['sharedIpGroupId', 'configureServer'])
         return (202, None)
     
@@ -216,23 +216,23 @@ class FakeClient(CloudServersClient):
     #
     
     def post_servers_1234_action(self, body, **kw):
-        nt.assert_equal(len(body.keys()), 1)
+        assert_equal(len(body.keys()), 1)
         action = body.keys()[0]
         if action == 'reboot':
-            nt.assert_equal(body[action].keys(), ['type'])
+            assert_equal(body[action].keys(), ['type'])
             assert_in(body[action]['type'], ['HARD', 'SOFT'])
         elif action == 'rebuild':
-            nt.assert_equal(body[action].keys(), ['imageId'])
+            assert_equal(body[action].keys(), ['imageId'])
         elif action == 'resize':
-            nt.assert_equal(body[action].keys(), ['flavorId'])
+            assert_equal(body[action].keys(), ['flavorId'])
         elif action == 'confirmResize':
-            nt.assert_equal(body[action], None)
+            assert_equal(body[action], None)
             # This one method returns a different response code
             return (204, None)
         elif action == 'revertResize':
-            nt.assert_equal(body[action], None)
+            assert_equal(body[action], None)
         else:
-            nt.assert_(False, "Unexpected server action: %s" % action)
+            fail("Unexpected server action: %s" % action)
         return (202, None)
         
     #
@@ -287,7 +287,7 @@ class FakeClient(CloudServersClient):
         return (200, {'image': self.get_images_detail()[1]['images'][0]})
         
     def post_images(self, body, **kw):
-        nt.assert_equal(body.keys(), ['image'])
+        assert_equal(body.keys(), ['image'])
         assert_has_keys(body['image'], required=['serverId', 'name'])
         return (202, self.get_images_1()[1])
         
@@ -305,7 +305,7 @@ class FakeClient(CloudServersClient):
         }})
         
     def post_servers_1234_backup_schedule(self, body, **kw):
-        nt.assert_equal(body.keys(), ['backupSchedule'])
+        assert_equal(body.keys(), ['backupSchedule'])
         assert_has_keys(body['backupSchedule'], required=['enabled'], optional=['weekly', 'daily'])
         return (204, None)
         
@@ -331,7 +331,7 @@ class FakeClient(CloudServersClient):
         return (200, {'sharedIpGroup': self.get_shared_ip_groups_detail()[1]['sharedIpGroups'][0]})
 
     def post_shared_ip_groups(self, body, **kw):
-        nt.assert_equal(body.keys(), ['sharedIpGroup'])
+        assert_equal(body.keys(), ['sharedIpGroup'])
         assert_has_keys(body['sharedIpGroup'], required=['name'], optional=['server'])
         return (201, {'sharedIpGroup': {
             'id': 10101,
