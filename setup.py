@@ -1,10 +1,15 @@
+import os
 from distribute_setup import use_setuptools; use_setuptools()
 from setuptools import setup, find_packages
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name = "python-cloudservers",
     version = "1.0a2",
     description = "Client library for Rackspace's Cloud Servers API",
+    long_description = read('README.rst'),
     url = 'http://packages.python.org/python-cloudservers',
     license = 'BSD',
     author = 'Jacob Kaplan-Moss',
