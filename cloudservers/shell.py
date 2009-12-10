@@ -11,8 +11,12 @@ import sys
 import textwrap
 
 # Choices for flags.
-DAY_CHOICES = [getattr(cloudservers, i) for i in dir(cloudservers) if i.startswith('BACKUP_WEEKLY_')]
-HOUR_CHOICES = [getattr(cloudservers, i) for i in dir(cloudservers) if i.startswith('BACKUP_DAILY_')]
+DAY_CHOICES = [getattr(cloudservers, i).lower() 
+               for i in dir(cloudservers)
+               if i.startswith('BACKUP_WEEKLY_')]
+HOUR_CHOICES = [getattr(cloudservers, i).lower()
+                for i in dir(cloudservers)
+                if i.startswith('BACKUP_DAILY_')]
 
 def pretty_choice_list(l): return ', '.join("'%s'" % i for i in l)
 
@@ -36,7 +40,7 @@ class CloudserversShell(object):
     # Hook for the test suite to inject a fake server.
     _api_class = cloudservers.CloudServers
     
-    def main(self, argv):
+    def __init__(self):
         self.parser = argparse.ArgumentParser(
             prog = 'cloudservers',
             description = __doc__.strip(),
@@ -91,7 +95,8 @@ class CloudserversShell(object):
             for (args, kwargs) in arguments:
                 subparser.add_argument(*args, **kwargs)
             subparser.set_defaults(func=callback)
-                
+    
+    def main(self, argv):                
         # Parse args and call whatever callback was selected
         args = self.parser.parse_args(argv)
         
@@ -133,7 +138,7 @@ class CloudserversShell(object):
             self.parser.print_help()
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
-    @arg('--enable', dest='enabled', action='store_true', help='Enable backups.')
+    @arg('--enable', dest='enabled', default=None, action='store_true', help='Enable backups.')
     @arg('--disable', dest='enabled', action='store_false', help='Disable backups.')
     @arg('--weekly', metavar='<day>', choices=DAY_CHOICES,
          help='Schedule a weekly backup for <day> (one of: %s).' % pretty_choice_list(DAY_CHOICES))
@@ -146,14 +151,28 @@ class CloudserversShell(object):
         With no flags, the backup schedule will be shown. If flags are given,
         the backup schedule will be modified accordingly.
         """
-        pass
+        server = self._find_server(args.server)
+        
+        # If we have some flags, update the backup
+        backup = {}
+        if args.daily:
+            backup['daily'] = getattr(cloudservers, 'BACKUP_DAILY_%s' % args.daily.upper())
+        if args.weekly:
+            backup['weekly'] = getattr(cloudservers, 'BACKUP_WEEKLY_%s' % args.weekly.upper())
+        if args.enabled is not None:
+            backup['enabled'] = args.enabled
+        if backup:
+            server.backup_schedule.update(**backup)
+        else:
+            print_dict(server.backup_schedule._info)
         
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_backup_schedule_delete(self, args):
         """
         Delete the backup schedule for a server.
         """
-        pass
+        server = self._find_server(args.server)
+        server.backup_schedule.delete()
     
     @arg('--flavor',
          default = None, 
@@ -181,7 +200,7 @@ class CloudserversShell(object):
         else:
             metadata = None
         server = self.cs.servers.create(args.name, image, flavor, args.ipgroup, metadata)
-        print "Booting server ID %s." % server.id
+        print_dict(server._info)
     
     def do_flavors(self, args):
         """Print a list of available 'flavors' (sizes of servers)."""

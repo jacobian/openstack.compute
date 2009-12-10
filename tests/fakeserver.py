@@ -25,7 +25,7 @@ class FakeServer(CloudServers):
         """
         nt.ok_(self.client.callstack, "Expected %s %s but no calls were made." % (method, url))
         nt.assert_equal(self.client.callstack[-1], (method, url),
-                        'Expected %s %s; got %s %s' % (self.client.callstack[-1] + (method, url)))
+                        'Expected %s %s; got %s %s' % ((method, url) + self.client.callstack[-1]))
         self.client.callstack = []
         
     def authenticate(self):
