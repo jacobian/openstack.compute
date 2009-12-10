@@ -1,11 +1,7 @@
 * Write intro-level docs.
-* Finish shell API.
-* Shell commands should take server names, flavor sizes, etc.
 
 -- release 1.0 beta
 
-* Test coverage for shell API
-* Need better error handling in the shell.
 * The aggressive caching makes stuff *very* annoying -- it's not clear at all
   that commands have been accepted. Is there any way to disable caching?
 
