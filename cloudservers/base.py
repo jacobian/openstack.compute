@@ -2,6 +2,8 @@
 Base utilities to build API operation managers and objects on top of.
 """
 
+from .exceptions import NotFound
+
 class Manager(object):
     """
     Managers interact with a particular type of API (servers, flavors, images,
@@ -42,7 +44,10 @@ class ManagerWithFind(Manager):
         the Python side.
         """
         rl = self.findall(**kwargs)
-        return rl and rl[0] or None
+        try:
+            return rl[0]
+        except IndexError:
+            raise NotFound(404, "No %s matching %s." % (self.resource_class.__name__, kwargs))
         
     def findall(self, **kwargs):
         """

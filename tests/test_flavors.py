@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from cloudservers import Flavor
+from cloudservers import Flavor, NotFound
 from .fakeserver import FakeServer
 from .utils import assert_isinstance
 import nose.tools as nt
@@ -27,5 +27,4 @@ def test_find():
     f = cs.flavors.find(disk=20)
     nt.assert_equal(f.name, '512 MB Server')
     
-    f = cs.flavors.find(disk=12345)
-    nt.assert_equal(f, None)
+    nt.assert_raises(NotFound, cs.flavors.find, disk=12345)

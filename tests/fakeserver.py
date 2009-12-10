@@ -19,13 +19,20 @@ class FakeServer(CloudServers):
         super(FakeServer, self).__init__('username', 'apikey')
         self.client = FakeClient()
 
-    def assert_called(self, method, url):
+    def assert_called(self, method, url, body=None):
         """
         Assert than an API method was just called.
         """
-        nt.ok_(self.client.callstack, "Expected %s %s but no calls were made." % (method, url))
-        nt.assert_equal(self.client.callstack[-1], (method, url),
-                        'Expected %s %s; got %s %s' % ((method, url) + self.client.callstack[-1]))
+        expected = (method, url)
+        called = self.client.callstack[-1][0:2]
+
+        nt.ok_(self.client.callstack, "Expected %s %s but no calls were made." % expected)
+        
+        nt.assert_equal(expected, called, 'Expected %s %s; got %s %s' % (expected + called))
+        
+        if body is not None:
+            nt.assert_equal(self.client.callstack[-1][2], body)
+        
         self.client.callstack = []
         
     def authenticate(self):
@@ -51,7 +58,7 @@ class FakeClient(CloudServersClient):
             fail('Called unknown API method: %s %s' % (method, url))
         
         # Note the call
-        self.callstack.append((method, url))
+        self.callstack.append((method, url, kwargs.get('body', None)))
         
         status, body = getattr(self, callback)(**kwargs)        
         return httplib2.Response({"status": status}), body
@@ -136,8 +143,8 @@ class FakeClient(CloudServersClient):
                 "status" : "BUILD",
                 "progress" : 60,
                 "addresses" : {
-                    "public" : ["67.23.10.132", "67.23.10.131"],
-                    "private" : ["10.176.42.16"]
+                    "public" : ["1.2.3.4", "5.6.7.8"],
+                    "private" : ["10.11.12.13"]
                 },
                 "metadata" : {
                     "Server Label" : "Web Head 1",
@@ -152,8 +159,8 @@ class FakeClient(CloudServersClient):
                 "hostId" : "9e107d9d372bb6826bd81d3542a419d6",
                 "status" : "ACTIVE",
                 "addresses" : {
-                    "public" : ["67.23.10.133"],
-                    "private" : ["10.176.42.17"]
+                    "public" : ["9.10.11.12"],
+                    "private" : ["10.11.12.14"]
                 },
                 "metadata" : {
                     "Server Label" : "DB 1"
@@ -310,14 +317,14 @@ class FakeClient(CloudServersClient):
     #
     def get_shared_ip_groups(self, **kw):
         return (200, {'sharedIpGroups': [
-            {'id': 1, 'name': 'Shared IP Group 1'},
-            {'id': 2, 'name': 'Shared IP Group 2'},
+            {'id': 1, 'name': 'group1'},
+            {'id': 2, 'name': 'group2'},
         ]})
         
     def get_shared_ip_groups_detail(self, **kw):
         return (200, {'sharedIpGroups': [
-            {'id': 1, 'name': 'Shared IP Group 1', 'servers': [1234]},
-            {'id': 2, 'name': 'Shared IP Group 2', 'servers': [5678]},
+            {'id': 1, 'name': 'group1', 'servers': [1234]},
+            {'id': 2, 'name': 'group2', 'servers': [5678]},
         ]})
         
     def get_shared_ip_groups_1(self, **kw):
@@ -325,11 +332,11 @@ class FakeClient(CloudServersClient):
 
     def post_shared_ip_groups(self, body, **kw):
         nt.assert_equal(body.keys(), ['sharedIpGroup'])
-        assert_has_keys(body['sharedIpGroup'], required=['name', 'server'])
+        assert_has_keys(body['sharedIpGroup'], required=['name'], optional=['server'])
         return (201, {'sharedIpGroup': {
             'id': 10101,
             'name': body['sharedIpGroup']['name'],
-            'servers': [body['sharedIpGroup']['server']]
+            'servers': 'server' in body['sharedIpGroup'] and [body['sharedIpGroup']['server']] or None
         }})
         
     def delete_shared_ip_groups_1(self, **kw):

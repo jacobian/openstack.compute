@@ -32,8 +32,8 @@ def test_delete_ipgroup():
     cs.assert_called('DELETE', '/shared_ip_groups/1')
     
 def test_find():
-    ipg = cs.ipgroups.find(name='Shared IP Group 1')
+    ipg = cs.ipgroups.find(name='group1')
     cs.assert_called('GET', '/shared_ip_groups/detail')
-    nt.assert_equal(ipg.name, 'Shared IP Group 1')
+    nt.assert_equal(ipg.name, 'group1')
     ipgl = cs.ipgroups.findall(id=1)
     nt.assert_equal(ipgl, [IPGroup(None, {'id': 1})])

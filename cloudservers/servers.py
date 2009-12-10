@@ -25,9 +25,8 @@ class Server(base.Resource):
         """
         Share an IP address from the given IP group onto this server.
         
-        :param ipgroup: The :class:`IPGroup` to share with.
-        :param address: The IP address to share. It must be one of this
-                        server's public IP addresses.
+        :param ipgroup: The :class:`IPGroup` that the given address belongs to.
+        :param address: The IP address to share.
         :param configure: If ``True``, the server will be automatically
                          configured to use this IP. I don't know why you'd
                          want this to be ``False``.
@@ -49,7 +48,7 @@ class Server(base.Resource):
         :param type: either :data:`REBOOT_SOFT` for a software-level reboot,
                      or `REBOOT_HARD` for a virtual power cycle hard reboot.
         """
-        self.manager.reboot(self)
+        self.manager.reboot(self, type)
         
     def rebuild(self, image):
         """
@@ -187,9 +186,8 @@ class ServerManager(base.ManagerWithFind):
         Share an IP address from the given IP group onto a server.
         
         :param server: The :class:`Server` (or its ID) to share onto.
-        :param ipgroup: The :class:`IPGroup` to share with.
-        :param address: The IP address to share. It must be one of the
-                        server's public IP addresses.
+        :param ipgroup: The :class:`IPGroup` that the given address belongs to.
+        :param address: The IP address to share.
         :param configure: If ``True``, the server will be automatically
                          configured to use this IP. I don't know why you'd
                          want this to be ``False``.

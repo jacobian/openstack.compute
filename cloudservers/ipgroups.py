@@ -30,7 +30,7 @@ class IPGroupManager(base.ManagerWithFind):
         """
         return self._get("/shared_ip_groups/%s" % base.getid(group), "sharedIpGroup")
     
-    def create(self, name, server):
+    def create(self, name, server=None):
         """
         Create a new :class:`IPGroup`
         
@@ -38,7 +38,9 @@ class IPGroupManager(base.ManagerWithFind):
         :param server: A :class:`Server` (or its ID) to make a member of this group.
         :rtype: :class:`IPGroup`
         """
-        data = {"sharedIpGroup": {"name": name, "server": base.getid(server)}}
+        data = {"sharedIpGroup": {"name": name}}
+        if server:
+            data['sharedIpGroup']['server'] = base.getid(server)
         return self._create('/shared_ip_groups', data, "sharedIpGroup")
     
     def delete(self, group):

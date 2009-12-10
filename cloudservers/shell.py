@@ -4,6 +4,7 @@ Command-line interface to the Cloud Servers API.
 
 import argparse
 import cloudservers
+import getpass
 import httplib2
 import os
 import prettytable
@@ -187,8 +188,8 @@ class CloudserversShell(object):
          metavar = '<group>',
          help = "IP group ID (see 'cloudservers ipgroups').")
     @arg('--meta', 
-         metavar = "key=value", 
-         nargs = '*',
+         metavar = "<key=value>", 
+         action = 'append',
          help = "Record arbitrary key/value metadata.")
     @arg('name', metavar='<name>', help='Name for the new server')
     def do_boot(self, args):
@@ -215,13 +216,16 @@ class CloudserversShell(object):
     @arg('address', metavar='<address>', help='IP address to share.')
     def do_ip_share(self, args):
         """Share an IP address from the given IP group onto a server."""
-        pass
+        server = self._find_server(args.server)
+        group = self._find_ipgroup(args.group)
+        server.share_ip(group, args.address)
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
-    @arg('address', metavar='<address>', help='IP address to share.')
+    @arg('address', metavar='<address>', help='Shared IP address to remove from the server.')
     def do_ip_unshare(self, args):
-        """Stop sharing the given address."""
-        pass
+        """Stop sharing an given address with a server."""
+        server = self._find_server(args.server)
+        server.unshare_ip(args.address)
 
     def do_ipgroup_list(self, args):
         """Show IP groups."""
@@ -230,19 +234,25 @@ class CloudserversShell(object):
     @arg('group', metavar='<group>', help='Name or ID of group.')
     def do_ipgroup_show(self, args):
         """Show details about a particular IP group."""
-        pass
+        group = self._find_ipgroup(args.group)
+        print_dict(group._info)
     
     @arg('name', metavar='<name>', help='What to name this new group.')
     @arg('server', metavar='<server>', nargs='?',
          help='Server (name or ID) to make a member of this new group.')
     def do_ipgroup_create(self, args):
         """Create a new IP group."""
-        pass
+        if args.server:
+            server = self._find_server(args.server)
+        else:
+            server = None
+        group = self.cs.ipgroups.create(args.name, server)
+        print_dict(group._info)
         
     @arg('group', metavar='<group>', help='Name or ID of group.')
     def do_ipgroup_delete(self, args):
         """Delete an IP group."""
-        pass
+        self._find_ipgroup(args.group).delete()
     
     def do_list(self, args):
         """List active servers."""
@@ -257,44 +267,51 @@ class CloudserversShell(object):
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_reboot(self, args):
         """Reboot a server."""
-        server = self._find_server(args.server)
-        server.reboot(args.reboot_type)
-        print "Rebooting server ID %s." % server.id
+        self._find_server(args.server).reboot(args.reboot_type)
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     @arg('image', metavar='<image>', help="Name or ID of new image.")
     def do_rebuild(self, args):
         """Shutdown, re-image, and re-boot a server."""
-        pass
+        server = self._find_server(args.server)
+        image = self._find_image(args.image)
+        server.rebuild(image)
         
     @arg('server', metavar='<server>', help='Name (old name) or ID of server.')
     @arg('name', metavar='<name>', help='New name for the server.')
     def do_rename(self, args):
         """Rename a server."""
-        pass
+        self._find_server(args.server).update(name=args.name)
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     @arg('flavor', metavar='<flavor>', help = "Name or ID of new flavor.")
     def do_resize(self, args):
         """Resize a server."""
-        pass
+        server = self._find_server(args.server)
+        flavor = self._find_flavor(args.flavor)
+        server.resize(flavor)
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_resize_confirm(self, args):
         """Confirm a previous resize."""
-        pass
+        self._find_server(args.server).confirm_resize()
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_resize_revert(self, args):
         """Revert a previous resize (and return to the previous VM)."""
-        pass
+        self._find_server(args.server).revert_resize()
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_root_password(self, args):
         """
         Change the root password for a server.
         """
-        pass
+        server = self._find_server(args.server)
+        p1 = getpass.getpass('New password: ')
+        p2 = getpass.getpass('Again: ')
+        if p1 != p2:
+            raise CommandError("Passwords do not match.")
+        server.update(password=p1)
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_show(self, args):
@@ -305,18 +322,37 @@ class CloudserversShell(object):
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_delete(self, args):
         """Immediately shut down and delete a server."""
-        self.cs.servers.delete(self._find_server(args.server))
-        print "OK."
+        self._find_server(args.server).delete()
         
     def _find_server(self, server):
         """Get a server by name or ID."""
+        return self._find_resource(self.cs.servers, server)
+    
+    def _find_ipgroup(self, group):
+        """Get an IP group by name or ID."""
+        return self._find_resource(self.cs.ipgroups, group)
+    
+    def _find_image(self, image):
+        """Get an image by name or ID."""
+        return self._find_resource(self.cs.images, image)
+    
+    def _find_flavor(self, flavor):
+        """Get a flavor by name, ID, or RAM size."""
         try:
-            if server.isdigit():
-                return self.cs.servers.get(int(server))
-            else:
-                return self.cs.servers.find(name=server)
+            return self._find_resource(self.cs.flavors, flavor)
         except cloudservers.NotFound:
-            raise CommandError("No server with a name or ID of '%s'." % server)
+            return self.cs.flavors.find(ram=flavor)
+    
+    def _find_resource(self, manager, name_or_id):
+        """Helper for the _find_* methods."""
+        try:
+            if name_or_id.isdigit():
+                return manager.get(int(name_or_id))
+            else:
+                return manager.find(name=name_or_id)
+        except cloudservers.NotFound:
+            raise CommandError("No %s with a name or ID of '%s' exists."
+                               % (manager.resource_class.__name__.lower(), name_or_id))
 
 # I'm picky about my shell help.
 class CloudserversHelpFormatter(argparse.HelpFormatter):
