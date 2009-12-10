@@ -28,7 +28,14 @@ def arg(*args, **kwargs):
 class CommandError(Exception):
     pass
 
+def env(e):
+    return os.environ.get(e, '')
+
 class CloudserversShell(object):
+    
+    # Hook for the test suite to inject a fake server.
+    _api_class = cloudservers.CloudServers
+    
     def main(self, argv):
         self.parser = argparse.ArgumentParser(
             prog = 'cloudservers',
@@ -38,9 +45,7 @@ class CloudserversShell(object):
             formatter_class = CloudserversHelpFormatter,
         )
         
-        # Global arguments
-        env = lambda n: os.environ.get(n, '')
-        
+        # Global arguments        
         self.parser.add_argument('-h', '--help',
             action = 'help',
             help = argparse.SUPPRESS,
@@ -89,6 +94,10 @@ class CloudserversShell(object):
                 
         # Parse args and call whatever callback was selected
         args = self.parser.parse_args(argv)
+        
+        # Short-circuit and deal with help right away.
+        if args.func == self.do_help:
+            self.do_help(args)
                 
         # Deal with global arguments
         if args.debug:
@@ -102,7 +111,7 @@ class CloudserversShell(object):
             raise CommandError("You must provide an API key, either via "
                                "--apikey or via env[CLOUD_SERVERS_API_KEY]")
 
-        self.cs = cloudservers.CloudServers(user, apikey)
+        self.cs = self._api_class(user, apikey)
         try:
             self.cs.authenticate()
         except cloudservers.Unauthorized:

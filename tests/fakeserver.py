@@ -15,7 +15,7 @@ from cloudservers.client import CloudServersClient
 from .utils import fail, assert_in, assert_not_in, assert_has_keys
 
 class FakeServer(CloudServers):
-    def __init__(self):
+    def __init__(self, username=None, password=None):
         super(FakeServer, self).__init__('username', 'apikey')
         self.client = FakeClient()
 
@@ -23,9 +23,13 @@ class FakeServer(CloudServers):
         """
         Assert than an API method was just called.
         """
+        nt.ok_(self.client.callstack, "Expected %s %s but no calls were made." % (method, url))
         nt.assert_equal(self.client.callstack[-1], (method, url),
                         'Expected %s %s; got %s %s' % (self.client.callstack[-1] + (method, url)))
         self.client.callstack = []
+        
+    def authenticate(self):
+        pass
 
 class FakeClient(CloudServersClient):
     def __init__(self):

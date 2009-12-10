@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import cloudservers.base
 from .fakeserver import FakeServer
 from cloudservers import Flavor
