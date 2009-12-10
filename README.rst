@@ -2,15 +2,74 @@ Python bindings to the Rackspace Cloud Servers API
 ==================================================
 
 This is a client for Rackspace's Cloud Servers API. There's a Python API (the
-``cloudservers`` module), and a command-line script (``cloudservers``).
+``cloudservers`` module), and a command-line script (``cloudservers``). Each implements 100% of the Rackspace API.
 
-Right now, the Python API implements 100% of the Cloud Servers API, and has
-nearly 100% test coverage. In other words, it works, and well. The
-command-line script is still under development and only supports about half of
-the API.
+You'll also probably want to read `Rackspace's API guide`__ (PDF) -- the first
+bit, at least -- to get an idea of the concepts. Rackspace is doing the cloud
+hosting thing a bit differently from Amazon, and if you get the concepts this
+library should make more sense.
 
-`Documentation is available`__, but still somewhat rudimentary. See for some
-reference material.
+__ http://docs.rackspacecloud.com/servers/api/cs-devguide-latest.pdf
+
+Command-line API
+----------------
+
+Installing this package gets you a shell command, ``cloudservers``, that you
+can use to interact with Rackspace.
+
+You'll need to provide your Rackspace username and API key. You can do this
+with the ``--username`` and ``--apikey`` params, but it's easier to just set
+them as environment variables::
+
+    export CLOUD_SERVERS_USERNAME=jacobian
+    export CLOUD_SERVERS_API_KEY=yadayada
+    
+You'll find complete documentation on the shell by running ``cloudservers help``::
+
+    usage: cloudservers [--username USERNAME] [--apikey APIKEY] <subcommand> ...
+
+    Command-line interface to the Cloud Servers API.
+
+    Positional arguments:
+      <subcommand>
+        backup-schedule     Show or edit the backup schedule for a server.
+        backup-schedule-delete
+                            Delete the backup schedule for a server.
+        boot                Boot a new server.
+        delete              Immediately shut down and delete a server.
+        flavors             Print a list of available 'flavors' (sizes of
+                            servers).
+        help                Display help about this program or one of its
+                            subcommands.
+        images              Print a list of available images to boot from.
+        ip-share            Share an IP address from the given IP group onto a
+                            server.
+        ip-unshare          Stop sharing an given address with a server.
+        ipgroup-create      Create a new IP group.
+        ipgroup-delete      Delete an IP group.
+        ipgroup-list        Show IP groups.
+        ipgroup-show        Show details about a particular IP group.
+        list                List active servers.
+        reboot              Reboot a server.
+        rebuild             Shutdown, re-image, and re-boot a server.
+        rename              Rename a server.
+        resize              Resize a server.
+        resize-confirm      Confirm a previous resize.
+        resize-revert       Revert a previous resize (and return to the previous
+                            VM).
+        root-password       Change the root password for a server.
+        show                Show details about the given server.
+
+    Optional arguments:
+      --username USERNAME   Defaults to env[CLOUD_SERVERS_USERNAME].
+      --apikey APIKEY       Defaults to env[CLOUD_SERVERS_API_KEY].
+
+    See "cloudservers help COMMAND" for help on a specific command.
+    
+Python API
+----------
+
+`Documentation is available`__, but somewhat rudimentary -- it's only a reference.
 
 __ http://packages.python.org/python-cloudservers/
 
@@ -31,13 +90,6 @@ By way of a quick-start::
     ... time passes ...
     
     >>> s.delete()
-    
-You'll also probably want to read `Rackspace's API guide`__ (PDF) -- the first
-bit, at least -- to get an idea of the concepts. Rackspace is doing the cloud
-hosting thing a bit differently from Amazon, and if you get the concepts this
-library should make more sense.
-
-__ http://docs.rackspacecloud.com/servers/api/cs-devguide-latest.pdf
 
 FAQ
 ===
