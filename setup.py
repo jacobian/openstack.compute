@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name = "python-cloudservers",
-    version = "1.0a2",
+    version = "1.0a3",
     description = "Client library for Rackspace's Cloud Servers API",
     long_description = read('README.rst'),
     url = 'http://packages.python.org/python-cloudservers',
