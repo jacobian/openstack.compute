@@ -56,4 +56,4 @@ class ImageManager(base.ManagerWithFind):
         
         :param image: The :class:`Image` (or its ID) to delete.
         """
-        self._delete("/images/%s" % getattr(image, 'id', int(image)))
+        self._delete("/images/%s" % base.getid(image))

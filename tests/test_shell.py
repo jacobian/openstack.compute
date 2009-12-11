@@ -77,7 +77,18 @@ def test_flavors():
 def test_images():
     shell('images')
     assert_called('GET', '/images/detail')
+
+def test_image_create():
+    shell('image-create sample-server new-image')
+    assert_called(
+        'POST', '/images',
+        {'image': {'name': 'new-image', 'serverId': 1234}}
+    )
     
+def test_image_delete():
+    shell('image-delete 1')
+    assert_called('DELETE', '/images/1')
+
 def test_ip_share():
     shell('ip-share sample-server 1 1.2.3.4')
     assert_called(

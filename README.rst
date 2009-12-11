@@ -25,7 +25,7 @@ them as environment variables::
     export CLOUD_SERVERS_API_KEY=yadayada
     
 You'll find complete documentation on the shell by running ``cloudservers help``::
-
+    
     usage: cloudservers [--username USERNAME] [--apikey APIKEY] <subcommand> ...
 
     Command-line interface to the Cloud Servers API.
@@ -41,6 +41,9 @@ You'll find complete documentation on the shell by running ``cloudservers help``
                             servers).
         help                Display help about this program or one of its
                             subcommands.
+        image-create        Create a new image by taking a snapshot of a running
+                            server.
+        image-delete        Delete an image.
         images              Print a list of available images to boot from.
         ip-share            Share an IP address from the given IP group onto a
                             server.

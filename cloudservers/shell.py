@@ -212,6 +212,25 @@ class CloudserversShell(object):
         print_list(self.cs.images.list(), ['ID', 'Name', 'Status'])
 
     @arg('server', metavar='<server>', help='Name or ID of server.')
+    @arg('name', metavar='<name>', help='Name for the new image.')
+    def do_image_create(self, args):
+        """Create a new image by taking a snapshot of a running server."""
+        server = self._find_server(args.server)
+        image = self.cs.images.create(args.name, server)
+        print_dict(image._info)
+    
+    @arg('image', metavar='<image>', help='Name or ID of image.')    
+    def do_image_delete(self, args):
+        """
+        Delete an image.
+        
+        It should go without saying, but you cn only delete images you
+        created.
+        """
+        image = self._find_image(args.image)
+        image.delete()
+
+    @arg('server', metavar='<server>', help='Name or ID of server.')
     @arg('group', metavar='<group>', help='Name or ID of group.')
     @arg('address', metavar='<address>', help='IP address to share.')
     def do_ip_share(self, args):
