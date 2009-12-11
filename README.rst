@@ -37,14 +37,14 @@ You'll find complete documentation on the shell by running ``cloudservers help``
                             Delete the backup schedule for a server.
         boot                Boot a new server.
         delete              Immediately shut down and delete a server.
-        flavors             Print a list of available 'flavors' (sizes of
+        flavor-list         Print a list of available 'flavors' (sizes of
                             servers).
         help                Display help about this program or one of its
                             subcommands.
         image-create        Create a new image by taking a snapshot of a running
                             server.
         image-delete        Delete an image.
-        images              Print a list of available images to boot from.
+        image-list          Print a list of available images to boot from.
         ip-share            Share an IP address from the given IP group onto a
                             server.
         ip-unshare          Stop sharing an given address with a server.

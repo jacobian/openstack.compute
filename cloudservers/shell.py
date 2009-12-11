@@ -204,11 +204,11 @@ class CloudserversShell(object):
         server = self.cs.servers.create(args.name, image, flavor, args.ipgroup, metadata)
         print_dict(server._info)
     
-    def do_flavors(self, args):
+    def do_flavor_list(self, args):
         """Print a list of available 'flavors' (sizes of servers)."""
         print_list(self.cs.flavors.list(), ['ID', 'Name', 'RAM', 'Disk'])
     
-    def do_images(self, args):
+    def do_image_list(self, args):
         """Print a list of available images to boot from."""
         print_list(self.cs.images.list(), ['ID', 'Name', 'Status'])
 

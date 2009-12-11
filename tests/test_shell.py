@@ -70,12 +70,12 @@ def test_boot():
                    'metadata': {'foo': 'bar', 'spam': 'eggs'}}}
     )
 
-def test_flavors():
-    shell('flavors')
+def test_flavor_list():
+    shell('flavor-list')
     assert_called('GET', '/flavors/detail')
     
-def test_images():
-    shell('images')
+def test_image_list():
+    shell('image-list')
     assert_called('GET', '/images/detail')
 
 def test_image_create():
