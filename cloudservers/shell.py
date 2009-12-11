@@ -104,6 +104,7 @@ class CloudserversShell(object):
         # Short-circuit and deal with help right away.
         if args.func == self.do_help:
             self.do_help(args)
+            return 0
                 
         # Deal with global arguments
         if args.debug:
