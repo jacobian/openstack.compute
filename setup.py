@@ -7,14 +7,14 @@ def read(fname):
 
 setup(
     name = "python-cloudservers",
-    version = "1.0a3",
+    version = "1.0a4",
     description = "Client library for Rackspace's Cloud Servers API",
     long_description = read('README.rst'),
     url = 'http://packages.python.org/python-cloudservers',
     license = 'BSD',
     author = 'Jacob Kaplan-Moss',
     author_email = 'jacob@jacobian.org',
-    packages = find_packages(),
+    packages = find_packages(exclude=['distribute_setup', 'tests']),
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Environment :: Console',

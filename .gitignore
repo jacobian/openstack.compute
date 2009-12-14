@@ -5,3 +5,4 @@ cover/
 pip-log.txt
 /.coverage
 /dist
+/build
