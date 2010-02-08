@@ -276,7 +276,7 @@ class CloudserversShell(object):
     
     def do_list(self, args):
         """List active servers."""
-        print_list(self.cs.servers.list(), ['ID', 'Name', 'Status'])
+        print_list(self.cs.servers.list(), ['ID', 'Name', 'Status', 'Public IP', 'Private IP'])
     
     @arg('--hard',
         dest = 'reboot_type',
@@ -337,7 +337,16 @@ class CloudserversShell(object):
     def do_show(self, args):
         """Show details about the given server."""
         s = self.cs.servers.get(self._find_server(args.server))
-        print_dict(s._info)
+        
+        info = s._info.copy()
+        addresses = info.pop('addresses')
+        for addrtype in addresses:
+            info['%s ip' % addrtype] = ', '.join(addresses[addrtype])
+        
+        info['flavor'] = self._find_flavor(info.pop('flavorId')).name
+        info['image'] = self._find_image(info.pop('imageId')).name
+        
+        print_dict(info)
     
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_delete(self, args):
@@ -366,7 +375,7 @@ class CloudserversShell(object):
     def _find_resource(self, manager, name_or_id):
         """Helper for the _find_* methods."""
         try:
-            if name_or_id.isdigit():
+            if isinstance(name_or_id, int) or name_or_id.isdigit():
                 return manager.get(int(name_or_id))
             else:
                 return manager.find(name=name_or_id)
@@ -386,7 +395,7 @@ def print_list(objs, fields):
     pt = prettytable.PrettyTable([f for f in fields], caching=False)
     pt.aligns = ['l' for f in fields]
     for o in objs:
-        pt.add_row([getattr(o, f.lower().replace(' ', ''), '') for f in fields])
+        pt.add_row([getattr(o, f.lower().replace(' ', '_'), '') for f in fields])
     pt.printt(sortby=fields[0])
     
 def print_dict(d):

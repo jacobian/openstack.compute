@@ -285,6 +285,9 @@ class FakeClient(CloudServersClient):
         
     def get_images_1(self, **kw):
         return (200, {'image': self.get_images_detail()[1]['images'][0]})
+
+    def get_images_2(self, **kw):
+        return (200, {'image': self.get_images_detail()[1]['images'][1]})
         
     def post_images(self, body, **kw):
         assert_equal(body.keys(), ['image'])

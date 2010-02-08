@@ -164,7 +164,9 @@ def test_root_password():
     
 def test_show():
     shell('show 1234')
-    assert_called('GET', '/servers/1234')
+    # XXX need a way to test multiple calls
+    # assert_called('GET', '/servers/1234')
+    assert_called('GET', '/images/2')
     
 def test_delete():
     shell('delete 1234')

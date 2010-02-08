@@ -90,6 +90,20 @@ class Server(base.Resource):
         """
         return self.manager.api.backup_schedules.get(self)
     
+    @property
+    def public_ip(self):
+        """
+        Shortcut to get this server's primary public IP address.
+        """
+        return self.addresses['public'][0]
+    
+    @property
+    def private_ip(self):
+        """
+        Shortcut to get this server's primary private IP address.
+        """
+        return self.addresses['private'][0]
+    
 class ServerManager(base.ManagerWithFind):
     resource_class = Server
     
