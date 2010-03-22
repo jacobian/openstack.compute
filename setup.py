@@ -1,9 +1,14 @@
 import os
+import sys
 from distribute_setup import use_setuptools; use_setuptools()
 from setuptools import setup, find_packages
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+requirements = ['httplib2', 'argparse', 'prettytable']
+if sys.version_info < (2,6):
+    requirements.append('simplejson')
 
 setup(
     name = "python-cloudservers",
@@ -24,7 +29,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    install_requires = ['httplib2', 'argparse', 'prettytable'],
+    install_requires = requirements,
     
     tests_require = ["nose", "mock"],
     test_suite = "nose.collector",
