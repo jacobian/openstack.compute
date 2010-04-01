@@ -11,6 +11,10 @@ library should make more sense.
 
 __ http://docs.rackspacecloud.com/servers/api/cs-devguide-latest.pdf
 
+Development takes place on GitHub__. Bug reports and patches may be filed there.
+
+__ http://github.com/jacobian/python-cloudservers
+
 Command-line API
 ----------------
 
@@ -24,7 +28,8 @@ them as environment variables::
     export CLOUD_SERVERS_USERNAME=jacobian
     export CLOUD_SERVERS_API_KEY=yadayada
     
-You'll find complete documentation on the shell by running ``cloudservers help``::
+You'll find complete documentation on the shell by running 
+``cloudservers help``::
     
     usage: cloudservers [--username USERNAME] [--apikey APIKEY] <subcommand> ...
 
