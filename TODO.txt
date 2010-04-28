@@ -1,8 +1,0 @@
-* Write intro-level docs.
-
--- release 1.0 beta
-
-* The aggressive caching makes stuff *very* annoying -- it's not clear at all
-  that commands have been accepted. Is there any way to disable caching?
-
---- release 1.0 final

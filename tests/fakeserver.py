@@ -9,6 +9,8 @@ behavior differs from the spec.
 from __future__ import absolute_import
 
 import httplib2
+import urlparse
+import urllib
 from nose.tools import assert_equal
 from cloudservers import CloudServers
 from cloudservers.client import CloudServersClient
@@ -50,7 +52,7 @@ class FakeClient(CloudServersClient):
             assert_not_in('body', kwargs)
         elif method in ['PUT', 'POST']:
             assert_in('body', kwargs)
-        
+
         # Call the method
         munged_url = url.strip('/').replace('/', '_').replace('.', '_')
         callback = "%s_%s" % (method.lower(), munged_url)
@@ -62,6 +64,9 @@ class FakeClient(CloudServersClient):
         
         status, body = getattr(self, callback)(**kwargs)        
         return httplib2.Response({"status": status}), body
+
+    def _munge_get_url(self, url):
+        return url
 
     #
     # Limits

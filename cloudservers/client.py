@@ -1,3 +1,6 @@
+import time
+import urlparse
+import urllib
 import httplib2
 try:
     import json
@@ -58,6 +61,7 @@ class CloudServersClient(httplib2.Http):
                 raise ex
 
     def get(self, url, **kwargs):
+        url = self._munge_get_url(url)
         return self._cs_request(url, 'GET', **kwargs)
     
     def post(self, url, **kwargs):
@@ -74,3 +78,18 @@ class CloudServersClient(httplib2.Http):
         resp, body = self.request(self.AUTH_URL, 'GET', headers=headers)
         self.management_url = resp['x-server-management-url']
         self.auth_token = resp['x-auth-token']
+        
+    def _munge_get_url(self, url):
+        """
+        Munge GET URLs to always return uncached content.
+        
+        The Cloud Servers API caches data *very* agressively and doesn't respect
+        cache headers. To avoid stale data, then, we append a little bit of
+        nonsense onto GET parameters; this appears to force the data not to be
+        cached.
+        """
+        scheme, netloc, path, query, frag = urlparse.urlsplit(url)
+        query = urlparse.parse_qsl(query)
+        query.append(('fresh', str(time.time())))
+        query = urllib.urlencode(query)
+        return urlparse.urlunsplit((scheme, netloc, path, query, frag))

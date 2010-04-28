@@ -16,11 +16,12 @@ def client():
 def test_get():
     cl = client()
     with mock.patch_object(httplib2.Http, "request", mock_request):
-        resp, body = cl.get("/hi")
-        mock_request.assert_called_with("http://example.com/hi", "GET", 
-            headers={"X-Auth-Token": "token", "User-Agent": cl.USER_AGENT})
-        # Automatic JSON parsing
-        assert_equal(body, {"hi":"there"})
+        with mock.patch('time.time', mock.Mock(return_value=1234)):
+            resp, body = cl.get("/hi")
+            mock_request.assert_called_with("http://example.com/hi?fresh=1234", "GET", 
+                headers={"X-Auth-Token": "token", "User-Agent": cl.USER_AGENT})
+            # Automatic JSON parsing
+            assert_equal(body, {"hi":"there"})
 
 def test_post():
     cl = client()
