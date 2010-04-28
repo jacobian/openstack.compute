@@ -71,6 +71,57 @@ def test_boot():
                    'metadata': {'foo': 'bar', 'spam': 'eggs'}}}
     )
 
+def test_boot_files():
+    testfile = os.path.join(os.path.dirname(__file__), 'testfile.txt')
+    expected_file_data = open(testfile).read().encode('base64')
+    
+    shell('boot some-server --image 1 --file /tmp/foo=%s --file /tmp/bar=%s' % (testfile, testfile))
+    
+    assert_called(
+        'POST', '/servers',
+        {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1,
+                    'personality': [
+                        {'path': '/tmp/bar', 'contents': expected_file_data},
+                        {'path': '/tmp/foo', 'contents': expected_file_data}
+                    ]}
+        }
+    )
+    
+def test_boot_invalid_file():
+    invalid_file = os.path.join(os.path.dirname(__file__), 'asdfasdfasdfasdf')
+    assert_raises(CommandError, shell, 'boot some-server --image 1 --file /foo=%s' % invalid_file)
+
+# #XXX FIXME: this still open()s the keyfile, so it fails if it doesn't exist. Hm.
+# def test_boot_key_auto():
+#     mock_exists = mock.Mock(return_value=True)
+#     with mock.patch_object(os.path, 'exists', mock_exists):
+#         shell('boot some-server --image 1 --key')
+#         assert_called(
+#             'POST', '/servers',
+#             {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1,
+#                         'personality': [
+#                             {'path': '/root/.ssh/authorized_keys2', 'contents': 'FIXME'},
+#                         ]}
+#             }
+#         )
+        
+def test_boot_key_file():
+    testfile = os.path.join(os.path.dirname(__file__), 'testfile.txt')
+    expected_file_data = open(testfile).read().encode('base64')
+    shell('boot some-server --image 1 --key %s' % testfile)
+    assert_called(
+        'POST', '/servers',
+        {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1,
+                    'personality': [
+                        {'path': '/root/.ssh/authorized_keys2', 'contents': expected_file_data},
+                    ]}
+        }
+    )
+
+def test_boot_invalid_keyfile():
+    invalid_file = os.path.join(os.path.dirname(__file__), 'asdfasdfasdfasdf')
+    assert_raises(CommandError, shell, 'boot some-server --image 1 --key %s' % invalid_file)
+
 def test_flavor_list():
     shell('flavor-list')
     assert_called('GET', '/flavors/detail')

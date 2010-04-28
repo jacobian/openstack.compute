@@ -21,6 +21,9 @@ HOUR_CHOICES = [getattr(cloudservers, i).lower()
 
 def pretty_choice_list(l): return ', '.join("'%s'" % i for i in l)
 
+# Sentinal for boot --key
+AUTO_KEY = object()
+
 # Decorator for args
 def arg(*args, **kwargs):
     def _decorator(func):
@@ -187,21 +190,62 @@ class CloudserversShell(object):
     @arg('--ipgroup',
          default = None, 
          metavar = '<group>',
-         help = "IP group ID (see 'cloudservers ipgroups').")
+         help = "IP group ID (see 'cloudservers ipgroup-list').")
     @arg('--meta', 
          metavar = "<key=value>", 
          action = 'append',
-         help = "Record arbitrary key/value metadata.")
+         default = [],
+         help = "Record arbitrary key/value metadata. May be give multiple times.")
+    @arg('--file',
+         metavar = "<dst-path=src-path>",
+         action = 'append',
+         dest = 'files',
+         default = [],
+         help = "Store arbitrary files from <src-path> locally to <dst-path> "\
+                "on the new server. You may store up to 5 files.")
+    @arg('--key',
+         metavar = '<path>',
+         nargs = '?',
+         const = AUTO_KEY,
+         help = "Key the server with an SSH keypair. Looks in ~/.ssh for a key, "\
+                "or takes an explicit <path> to one.")
     @arg('name', metavar='<name>', help='Name for the new server')
     def do_boot(self, args):
         """Boot a new server."""
         flavor = args.flavor or self.cs.flavors.find(ram=256)
         image = args.image or self.cs.images.find(name="Ubuntu 9.10 (karmic)")
-        if args.meta:
-            metadata = dict(v.split('=') for v in args.meta)
+        
+        metadata = dict(v.split('=') for v in args.meta)
+            
+        files = {}
+        for f in args.files:
+            dst, src = f.split('=', 1)
+            try:
+                files[dst] = open(src)
+            except IOError, e:
+                raise CommandError("Can't open '%s': %s" % (src, e))
+        
+        if args.key is AUTO_KEY:
+            possible_keys = [os.path.join(os.path.expanduser('~'), '.ssh', k)
+                             for k in ('id_dsa.pub', 'id_rsa.pub')]
+            for k in possible_keys:
+                if os.path.exists(k):
+                    keyfile = k
+                    break
+            else:
+                raise CommandError("Couldn't find a key file: tried ~/.ssh/id_dsa.pub or ~/.ssh/id_rsa.pub")
+        elif args.key:
+            keyfile = args.key
         else:
-            metadata = None
-        server = self.cs.servers.create(args.name, image, flavor, args.ipgroup, metadata)
+            keyfile = None
+            
+        if keyfile:
+            try:
+                files['/root/.ssh/authorized_keys2'] = open(keyfile)
+            except IOError, e:
+                raise CommandError("Can't open '%s': %s" % (keyfile, e))
+        
+        server = self.cs.servers.create(args.name, image, flavor, args.ipgroup, metadata, files)
         print_dict(server._info)
     
     def do_flavor_list(self, args):
