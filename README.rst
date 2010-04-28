@@ -2,7 +2,12 @@ Python bindings to the Rackspace Cloud Servers API
 ==================================================
 
 This is a client for Rackspace's Cloud Servers API. There's a Python API (the
-``cloudservers`` module), and a command-line script (``cloudservers``). Each implements 100% of the Rackspace API.
+``cloudservers`` module), and a command-line script (``cloudservers``). Each
+implements 100% of the Rackspace API.
+
+`Full documentation is available`__.
+
+__ http://packages.python.org/python-cloudservers/
 
 You'll also probably want to read `Rackspace's API guide`__ (PDF) -- the first
 bit, at least -- to get an idea of the concepts. Rackspace is doing the cloud

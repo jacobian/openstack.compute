@@ -6,7 +6,13 @@ This is a client for Rackspace's Cloud Servers API. There's :doc:`a Python API
 <shell>` (installed as :program:`cloudservers`). Each implements the entire
 Rackspace Cloud Servers API.
 
-You'll need a `Rackspace Cloud`_ account, and you'll need to make sure to sign up for both Cloud Servers *and* Cloud Files -- Rackspace won't let you get an API key unless you've got a Cloud Files account, too. Once you've got an account, you'll find your API key in the management console under "Your Account".
+You'll need a `Rackspace Cloud`__ account, and you'll need to make sure to sign
+up for both Cloud Servers *and* Cloud Files -- Rackspace won't let you get an
+API key unless you've got a Cloud Files account, too. Once you've got an
+account, you'll find your API key in the management console under "Your
+Account".
+
+__ http://rackspacecloud.com/
 
 .. seealso::
 
@@ -29,9 +35,9 @@ Contents:
 Contributing
 ============
 
-Development takes place `on GitHub
-<http://github.com/jacobian/python-cloudservers>_; please file bugs/pull
-requests there.
+Development takes place `on GitHub`__; please file bugs/pull requests there.
+
+__ http://github.com/jacobian/python-cloudservers
 
 Run tests with ``python setup.py test``.
 
