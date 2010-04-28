@@ -12,7 +12,7 @@ if sys.version_info < (2,6):
 
 setup(
     name = "python-cloudservers",
-    version = "1.0a5",
+    version = "1.0",
     description = "Client library for Rackspace's Cloud Servers API",
     long_description = read('README.rst'),
     url = 'http://packages.python.org/python-cloudservers',
@@ -21,7 +21,7 @@ setup(
     author_email = 'jacob@jacobian.org',
     packages = find_packages(exclude=['distribute_setup', 'tests']),
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Information Technology',

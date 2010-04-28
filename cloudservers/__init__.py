@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-__version__ = ('1.0a1')
+__version__ = '1.0'
 
 from .backup_schedules import (BackupSchedule, BackupScheduleManager, 
         BACKUP_WEEKLY_DISABLED, BACKUP_WEEKLY_SUNDAY, BACKUP_WEEKLY_MONDAY,
