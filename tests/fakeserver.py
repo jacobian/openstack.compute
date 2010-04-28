@@ -254,6 +254,9 @@ class FakeClient(CloudServersClient):
     def get_flavors_1(self, **kw):
         return (200, {'flavor': self.get_flavors_detail()[1]['flavors'][0]})
     
+    def get_flavors_2(self, **kw):
+        return (200, {'flavor': self.get_flavors_detail()[1]['flavors'][1]})
+    
     #
     # Images
     #

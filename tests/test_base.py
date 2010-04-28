@@ -1,8 +1,10 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
+import mock
 import cloudservers.base
 from .fakeserver import FakeServer
 from cloudservers import Flavor
+from cloudservers.exceptions import NotFound
 from cloudservers.base import Resource
 from nose.tools import assert_equal, assert_not_equal, assert_raises
 
@@ -42,3 +44,11 @@ def test_eq():
     r1 = Resource(None, {'name': 'joe', 'age': 12})
     r2 = Resource(None, {'name': 'joe', 'age': 12})
     assert_equal(r1, r2)
+    
+def test_findall_invalid_attribute():
+    # Make sure findall with an invalid attribute doesn't cause errors.
+    # The following should not raise an exception.
+    cs.flavors.findall(vegetable='carrot')
+    
+    # However, find() should raise an error
+    assert_raises(NotFound, cs.flavors.find, vegetable='carrot')

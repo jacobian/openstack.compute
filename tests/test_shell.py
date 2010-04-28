@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import os
 import mock
+import httplib2
 from nose.tools import assert_raises
 from cloudservers.shell import CloudserversShell, CommandError
 from .fakeserver import FakeServer
@@ -13,7 +14,7 @@ def setup():
         'CLOUD_SERVERS_USERNAME': 'username',
         'CLOUD_SERVERS_API_KEY': 'password'
     }
-    _old_env, os.environ = os.environ, fake_env
+    _old_env, os.environ = os.environ, fake_env.copy()
 
     # Make a fake shell object, a helping wrapper to call it, and a quick way
     # of asserting that certain API calls were made.
@@ -182,3 +183,8 @@ def test_help():
         shell('help delete')
         m.assert_called()
     assert_raises(CommandError, shell, 'help foofoo')
+
+def test_debug():
+    httplib2.debuglevel = 0
+    shell('--debug list')
+    assert httplib2.debuglevel == 1

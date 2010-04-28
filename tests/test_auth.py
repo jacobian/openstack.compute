@@ -39,3 +39,8 @@ def test_auth_automatic():
             mock_authenticate.assert_called()
             mock_request.assert_called()
             
+def test_auth_manual():
+    cs = cloudservers.CloudServers("username", "password")
+    with mock.patch_object(cs.client, 'authenticate') as mocked:
+        cs.authenticate()
+        mocked.assert_called()
