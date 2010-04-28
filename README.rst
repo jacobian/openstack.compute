@@ -77,7 +77,7 @@ You'll find complete documentation on the shell by running
 Python API
 ----------
 
-`Documentation is available`__, but somewhat rudimentary -- it's only a reference.
+There's also a `complete Python API`__.
 
 __ http://packages.python.org/python-cloudservers/
 
@@ -108,4 +108,3 @@ What's wrong with libcloud?
     common denominator; I needed access to the Rackspace-specific APIs (shared
     IP groups, image snapshots, resizing, etc.). I also wanted a command-line
     utility.
-    

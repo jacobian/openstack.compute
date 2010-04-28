@@ -54,7 +54,7 @@ class CloudServers(object):
         Normally this is called automatically when you first access the API,
         but you can call this method to force authentication right now.
         
-        Returns on success; raises :class:`cloudservers.Unauthorized` if the
+        Returns on success; raises :exc:`cloudservers.Unauthorized` if the
         credentials are wrong.
         """
         self.client.authenticate()
