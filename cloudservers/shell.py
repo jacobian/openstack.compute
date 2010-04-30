@@ -186,7 +186,7 @@ class CloudserversShell(object):
     @arg('--image', 
          default = None,
          metavar = '<image>',
-         help = "Image ID (see 'cloudservers images'). Defaults to Ubuntu 9.10.")
+         help = "Image ID (see 'cloudservers images'). Defaults to Ubuntu 10.04 LTS.")
     @arg('--ipgroup',
          default = None, 
          metavar = '<group>',
@@ -213,7 +213,7 @@ class CloudserversShell(object):
     def do_boot(self, args):
         """Boot a new server."""
         flavor = args.flavor or self.cs.flavors.find(ram=256)
-        image = args.image or self.cs.images.find(name="Ubuntu 9.10 (karmic)")
+        image = args.image or self.cs.images.find(name="Ubuntu 10.04 LTS (lucid)")
         
         metadata = dict(v.split('=') for v in args.meta)
             
