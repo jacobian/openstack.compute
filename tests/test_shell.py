@@ -3,7 +3,8 @@ from __future__ import absolute_import
 import os
 import mock
 import httplib2
-from nose.tools import assert_raises
+from contextlib import nested
+from nose.tools import assert_raises, assert_equal
 from cloudservers.shell import CloudserversShell, CommandError
 from .fakeserver import FakeServer
 
@@ -91,20 +92,30 @@ def test_boot_invalid_file():
     invalid_file = os.path.join(os.path.dirname(__file__), 'asdfasdfasdfasdf')
     assert_raises(CommandError, shell, 'boot some-server --image 1 --file /foo=%s' % invalid_file)
 
-# #XXX FIXME: this still open()s the keyfile, so it fails if it doesn't exist. Hm.
-# def test_boot_key_auto():
-#     mock_exists = mock.Mock(return_value=True)
-#     with mock.patch_object(os.path, 'exists', mock_exists):
-#         shell('boot some-server --image 1 --key')
-#         assert_called(
-#             'POST', '/servers',
-#             {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1,
-#                         'personality': [
-#                             {'path': '/root/.ssh/authorized_keys2', 'contents': 'FIXME'},
-#                         ]}
-#             }
-#         )
-        
+def test_boot_key_auto():
+    mock_exists = mock.Mock(return_value=True)
+    mock_open = mock.Mock()
+    mock_open.return_value = mock.Mock()
+    mock_open.return_value.read = mock.Mock(return_value='SSHKEY')
+    
+    with nested(mock.patch('os.path.exists', mock_exists),
+                mock.patch('__builtin__.open', mock_open)):
+        shell('boot some-server --image 1 --key')
+        assert_called(
+            'POST', '/servers',
+            {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1,
+                        'personality': [{
+                            'path': '/root/.ssh/authorized_keys2', 
+                            'contents': ('SSHKEY').encode('base64')},
+                        ]}
+            }
+        )
+
+def test_boot_key_auto_no_keys():
+    mock_exists = mock.Mock(return_value=False)
+    with mock.patch('os.path.exists', mock_exists):
+        assert_raises(CommandError, shell, 'boot some-server --image 1 --key')
+
 def test_boot_key_file():
     testfile = os.path.join(os.path.dirname(__file__), 'testfile.txt')
     expected_file_data = open(testfile).read().encode('base64')
