@@ -31,6 +31,7 @@ Contents:
    shell
    api
    ref/index
+   releases
 
 Contributing
 ============
