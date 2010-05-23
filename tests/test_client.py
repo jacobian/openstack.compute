@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import mock
 import httplib2
 from cloudservers.client import CloudServersClient
