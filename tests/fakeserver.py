@@ -185,6 +185,10 @@ class FakeClient(CloudServersClient):
         r = {'server': self.get_servers_detail()[1]['servers'][0]}
         return (200, r)
 
+    def get_servers_5678(self, **kw):
+        r = {'server': self.get_servers_detail()[1]['servers'][1]}
+        return (200, r)
+
     def put_servers_1234(self, body, **kw):
         assert_equal(body.keys(), ['server'])
         assert_has_keys(body['server'], optional=['name', 'adminPass'])

@@ -293,7 +293,12 @@ class CloudserversShell(object):
 
     def do_ipgroup_list(self, args):
         """Show IP groups."""
-        print_list(self.cs.ipgroups.list(), ['ID', 'Name', 'Servers'])
+        def pretty_server_list(ipgroup):
+            return ", ".join(self.cs.servers.get(id).name for id in ipgroup.servers)
+            
+        print_list(self.cs.ipgroups.list(), 
+                   fields = ['ID', 'Name', 'Server List'], 
+                   formatters = {'Server List': pretty_server_list})
         
     @arg('group', metavar='<group>', help='Name or ID of group.')
     def do_ipgroup_show(self, args):
@@ -435,11 +440,19 @@ class CloudserversHelpFormatter(argparse.HelpFormatter):
         super(CloudserversHelpFormatter, self).start_section(heading)
 
 # Helpers
-def print_list(objs, fields):
+def print_list(objs, fields, formatters={}):
     pt = prettytable.PrettyTable([f for f in fields], caching=False)
     pt.aligns = ['l' for f in fields]
+    
     for o in objs:
-        pt.add_row([getattr(o, f.lower().replace(' ', '_'), '') for f in fields])
+        row = []
+        for field in fields:
+            if field in formatters:
+                row.append(formatters[field](o))
+            else:
+                row.append(getattr(o, field.lower().replace(' ', '_'), ''))
+        pt.add_row(row)
+    
     pt.printt(sortby=fields[0])
     
 def print_dict(d):

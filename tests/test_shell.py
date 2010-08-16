@@ -4,6 +4,7 @@ import httplib2
 from nose.tools import assert_raises, assert_equal
 from cloudservers.shell import CloudserversShell, CommandError
 from fakeserver import FakeServer
+from utils import assert_in
 
 # Patch os.environ to avoid required auth info.
 def setup():
@@ -169,7 +170,8 @@ def test_ip_unshare():
     
 def test_ipgroup_list():
     shell('ipgroup-list')
-    assert_called('GET', '/shared_ip_groups/detail')
+    assert_in(('GET', '/shared_ip_groups/detail', None), _shell.cs.client.callstack)
+    assert_called('GET', '/servers/5678')
     
 def test_ipgroup_show():
     shell('ipgroup-show 1')
