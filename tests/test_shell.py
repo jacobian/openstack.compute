@@ -138,6 +138,20 @@ def test_boot_invalid_keyfile():
     invalid_file = os.path.join(os.path.dirname(__file__), 'asdfasdfasdfasdf')
     assert_raises(CommandError, shell, 'boot some-server --image 1 --key %s' % invalid_file)
 
+def test_boot_ipgroup():
+    shell('boot --image 1 --ipgroup 1 some-server')
+    assert_called(
+        'POST', '/servers',
+        {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1, 'sharedIpGroupId': 1}}
+    )
+
+def test_boot_ipgroup_name():
+    shell('boot --image 1 --ipgroup group1 some-server')
+    assert_called(
+        'POST', '/servers',
+        {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1, 'sharedIpGroupId': 1}}
+    )
+
 def test_flavor_list():
     shell('flavor-list')
     assert_called('GET', '/flavors/detail')

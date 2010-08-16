@@ -190,7 +190,7 @@ class CloudserversShell(object):
     @arg('--ipgroup',
          default = None, 
          metavar = '<group>',
-         help = "IP group ID (see 'cloudservers ipgroup-list').")
+         help = "IP group name or ID (see 'cloudservers ipgroup-list').")
     @arg('--meta', 
          metavar = "<key=value>", 
          action = 'append',
@@ -214,6 +214,13 @@ class CloudserversShell(object):
         """Boot a new server."""
         flavor = args.flavor or self.cs.flavors.find(ram=256)
         image = args.image or self.cs.images.find(name="Ubuntu 10.04 LTS (lucid)")
+        
+        # Map --ipgroup <name> to an ID.
+        # XXX do this for flavor/image?
+        if args.ipgroup:
+            ipgroup = self._find_ipgroup(args.ipgroup)
+        else:
+            ipgroup = None
         
         metadata = dict(v.split('=') for v in args.meta)
             
@@ -245,7 +252,7 @@ class CloudserversShell(object):
             except IOError, e:
                 raise CommandError("Can't open '%s': %s" % (keyfile, e))
         
-        server = self.cs.servers.create(args.name, image, flavor, args.ipgroup, metadata, files)
+        server = self.cs.servers.create(args.name, image, flavor, ipgroup, metadata, files)
         print_dict(server._info)
     
     def do_flavor_list(self, args):
