@@ -1,4 +1,4 @@
-__version__ = '1.1'
+__version__ = '1.2'
 
 from cloudservers.backup_schedules import (BackupSchedule, BackupScheduleManager, 
         BACKUP_WEEKLY_DISABLED, BACKUP_WEEKLY_SUNDAY, BACKUP_WEEKLY_MONDAY,

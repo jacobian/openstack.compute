@@ -11,7 +11,7 @@ if sys.version_info < (2,6):
 
 setup(
     name = "python-cloudservers",
-    version = "1.1",
+    version = "1.2",
     description = "Client library for Rackspace's Cloud Servers API",
     long_description = read('README.rst'),
     url = 'http://packages.python.org/python-cloudservers',
