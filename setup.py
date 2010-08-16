@@ -1,6 +1,5 @@
 import os
 import sys
-from distribute_setup import use_setuptools; use_setuptools()
 from setuptools import setup, find_packages
 
 def read(fname):
@@ -19,7 +18,7 @@ setup(
     license = 'BSD',
     author = 'Jacob Kaplan-Moss',
     author_email = 'jacob@jacobian.org',
-    packages = find_packages(exclude=['distribute_setup', 'tests']),
+    packages = find_packages(exclude=['tests']),
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
