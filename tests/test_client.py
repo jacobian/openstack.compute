@@ -16,7 +16,7 @@ def client():
 
 def test_get():
     cl = client()
-    with mock.patch_object(httplib2.Http, "request", mock_request):
+    with mock.patch.object(httplib2.Http, "request", mock_request):
         with mock.patch('time.time', mock.Mock(return_value=1234)):
             resp, body = cl.get("/hi")
             mock_request.assert_called_with("http://example.com/hi?fresh=1234", "GET", 
@@ -26,7 +26,7 @@ def test_get():
 
 def test_post():
     cl = client()
-    with mock.patch_object(httplib2.Http, "request", mock_request):
+    with mock.patch.object(httplib2.Http, "request", mock_request):
         cl.post("/hi", body=[1, 2, 3])
         mock_request.assert_called_with("http://example.com/hi", "POST", 
             headers = {

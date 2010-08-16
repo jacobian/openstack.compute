@@ -239,10 +239,10 @@ def test_delete():
     assert_called('DELETE', '/servers/1234')
     
 def test_help():
-    with mock.patch_object(_shell.parser, 'print_help') as m:
+    with mock.patch.object(_shell.parser, 'print_help') as m:
         shell('help')
         m.assert_called()
-    with mock.patch_object(_shell.subcommands['delete'], 'print_help') as m:
+    with mock.patch.object(_shell.subcommands['delete'], 'print_help') as m:
         shell('help delete')
         m.assert_called()
     assert_raises(CommandError, shell, 'help foofoo')
