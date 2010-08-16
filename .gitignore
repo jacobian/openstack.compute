@@ -6,3 +6,4 @@ pip-log.txt
 /.coverage
 /dist
 /build
+/.tox
