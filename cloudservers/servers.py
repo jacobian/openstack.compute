@@ -1,4 +1,4 @@
-from . import base
+from cloudservers import base
 
 REBOOT_SOFT, REBOOT_HARD = 'SOFT', 'HARD'
 

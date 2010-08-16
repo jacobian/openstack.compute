@@ -6,15 +6,13 @@ wrong the tests might fail. I've indicated in comments the places where actual
 behavior differs from the spec.
 """
 
-from __future__ import absolute_import
-
 import httplib2
 import urlparse
 import urllib
 from nose.tools import assert_equal
 from cloudservers import CloudServers
 from cloudservers.client import CloudServersClient
-from .utils import fail, assert_in, assert_not_in, assert_has_keys
+from utils import fail, assert_in, assert_not_in, assert_has_keys
 
 class FakeServer(CloudServers):
     def __init__(self, username=None, password=None):

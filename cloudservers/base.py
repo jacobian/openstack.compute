@@ -2,7 +2,14 @@
 Base utilities to build API operation managers and objects on top of.
 """
 
-from .exceptions import NotFound
+from cloudservers.exceptions import NotFound
+
+# Python 2.4 compat
+try:
+    all
+except NameError:
+    def all(iterable):
+        return True not in (not x for x in iterable)
 
 class Manager(object):
     """

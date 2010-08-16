@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-
 import StringIO
 from nose.tools import assert_equal
-from .fakeserver import FakeServer
-from .utils import assert_isinstance
+from fakeserver import FakeServer
+from utils import assert_isinstance
 from cloudservers import Server
 
 cs = FakeServer()

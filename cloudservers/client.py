@@ -13,7 +13,7 @@ if not hasattr(urlparse, 'parse_qsl'):
     urlparse.parse_qsl = cgi.parse_qsl
 
 import cloudservers
-from . import exceptions
+from cloudservers import exceptions
 
 class CloudServersClient(httplib2.Http):
     
@@ -39,7 +39,10 @@ class CloudServersClient(httplib2.Http):
             kwargs['body'] = json.dumps(kwargs['body'])
             
         resp, body = super(CloudServersClient, self).request(*args, **kwargs)
-        body = json.loads(body) if body else None
+        if body:
+            body = json.loads(body)
+        else:
+            body = None
 
         if resp.status in (400, 401, 403, 404, 413, 500):
             raise exceptions.from_response(resp, body)

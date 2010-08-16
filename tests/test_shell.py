@@ -1,13 +1,9 @@
-from __future__ import with_statement
-from __future__ import absolute_import
-
 import os
 import mock
 import httplib2
-from contextlib import nested
 from nose.tools import assert_raises, assert_equal
 from cloudservers.shell import CloudserversShell, CommandError
-from .fakeserver import FakeServer
+from fakeserver import FakeServer
 
 # Patch os.environ to avoid required auth info.
 def setup():
@@ -99,8 +95,9 @@ def test_boot_key_auto():
     mock_open.return_value = mock.Mock()
     mock_open.return_value.read = mock.Mock(return_value='SSHKEY')
     
-    with nested(mock.patch('os.path.exists', mock_exists),
-                mock.patch('__builtin__.open', mock_open)):
+    @mock.patch('os.path.exists', mock_exists)
+    @mock.patch('__builtin__.open', mock_open)
+    def test_shell_call():
         shell('boot some-server --image 1 --key')
         assert_called(
             'POST', '/servers',
@@ -111,11 +108,17 @@ def test_boot_key_auto():
                         ]}
             }
         )
+        
+    test_shell_call()
 
 def test_boot_key_auto_no_keys():
     mock_exists = mock.Mock(return_value=False)
-    with mock.patch('os.path.exists', mock_exists):
+    
+    @mock.patch('os.path.exists', mock_exists)
+    def test_shell_call():
         assert_raises(CommandError, shell, 'boot some-server --image 1 --key')
+    
+    test_shell_call()
 
 def test_boot_key_file():
     testfile = os.path.join(os.path.dirname(__file__), 'testfile.txt')
@@ -239,12 +242,19 @@ def test_delete():
     assert_called('DELETE', '/servers/1234')
     
 def test_help():
-    with mock.patch.object(_shell.parser, 'print_help') as m:
+    @mock.patch.object(_shell.parser, 'print_help')
+    def test_help(m):
         shell('help')
         m.assert_called()
-    with mock.patch.object(_shell.subcommands['delete'], 'print_help') as m:
+        
+    @mock.patch.object(_shell.subcommands['delete'], 'print_help')
+    def test_help_delete(m):
         shell('help delete')
         m.assert_called()
+        
+    test_help()
+    test_help_delete()
+        
     assert_raises(CommandError, shell, 'help foofoo')
 
 def test_debug():

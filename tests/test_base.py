@@ -1,12 +1,11 @@
-from __future__ import absolute_import, with_statement
 
 import mock
 import cloudservers.base
-from .fakeserver import FakeServer
 from cloudservers import Flavor
 from cloudservers.exceptions import NotFound
 from cloudservers.base import Resource
 from nose.tools import assert_equal, assert_not_equal, assert_raises
+from fakeserver import FakeServer
 
 cs = FakeServer()
 

@@ -1,4 +1,4 @@
-from . import base
+from cloudservers import base
 
 BACKUP_WEEKLY_DISABLED  = 'DISABLED'
 BACKUP_WEEKLY_SUNDAY    = 'SUNDAY'

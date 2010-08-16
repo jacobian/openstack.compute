@@ -1,4 +1,4 @@
-from . import base
+from cloudservers import base
 
 class Flavor(base.Resource):
     """

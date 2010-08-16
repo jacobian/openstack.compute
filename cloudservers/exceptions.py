@@ -45,7 +45,12 @@ class OverLimit(CloudServersException):
     http_status = 413
     message = "Over limit"
 
-_code_map = dict((c.http_status, c) for c in CloudServersException.__subclasses__())
+# In Python 2.4 Exception is old-style and thus doesn't have a __subclasses__()
+# so we can do this:
+#     _code_map = dict((c.http_status, c) for c in CloudServersException.__subclasses__())
+#
+# Instead, we have to hardcode it:
+_code_map = dict((c.http_status, c) for c in [BadRequest, Unauthorized, Forbidden, NotFound, OverLimit])
 
 def from_response(response, body):
     """

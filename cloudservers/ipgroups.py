@@ -1,4 +1,4 @@
-from . import base
+from cloudservers import base
 
 class IPGroup(base.Resource):
     def __repr__(self):

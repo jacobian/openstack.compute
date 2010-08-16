@@ -1,4 +1,4 @@
-from . import base
+from cloudservers import base
 
 class Image(base.Resource):
     """

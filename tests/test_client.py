@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import mock
 import httplib2
 from cloudservers.client import CloudServersClient
@@ -16,17 +15,23 @@ def client():
 
 def test_get():
     cl = client()
-    with mock.patch.object(httplib2.Http, "request", mock_request):
-        with mock.patch('time.time', mock.Mock(return_value=1234)):
-            resp, body = cl.get("/hi")
-            mock_request.assert_called_with("http://example.com/hi?fresh=1234", "GET", 
-                headers={"X-Auth-Token": "token", "User-Agent": cl.USER_AGENT})
-            # Automatic JSON parsing
-            assert_equal(body, {"hi":"there"})
+    
+    @mock.patch.object(httplib2.Http, "request", mock_request)
+    @mock.patch('time.time', mock.Mock(return_value=1234))
+    def test_get_call():
+        resp, body = cl.get("/hi")
+        mock_request.assert_called_with("http://example.com/hi?fresh=1234", "GET", 
+            headers={"X-Auth-Token": "token", "User-Agent": cl.USER_AGENT})
+        # Automatic JSON parsing
+        assert_equal(body, {"hi":"there"})
+
+    test_get_call()
 
 def test_post():
     cl = client()
-    with mock.patch.object(httplib2.Http, "request", mock_request):
+    
+    @mock.patch.object(httplib2.Http, "request", mock_request)
+    def test_post_call():
         cl.post("/hi", body=[1, 2, 3])
         mock_request.assert_called_with("http://example.com/hi", "POST", 
             headers = {
@@ -35,3 +40,5 @@ def test_post():
                 "User-Agent": cl.USER_AGENT},
             body = '[1, 2, 3]'
         )
+    
+    test_post_call()
