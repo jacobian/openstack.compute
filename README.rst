@@ -120,18 +120,4 @@ What's wrong with libcloud?
 What's new?
 -----------
 
-New in ``python-cloudservers`` 1.2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Support for Python 2.4 - 2.7.
-* Improved output of ``ipgroup-list``.
-* Made ``boot --ipgroup <name>`` work (as well as ``--ipgroup <id>``).
-
-New in ``python-cloudservers`` 1.1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Added support for uploading files to the shell ``boot`` command (via the
-  ``--files`` flag).
-* Added a shortcut ``--key`` for quickly adding an SSH key on boot.
-* Changed the default server image for the ``boot`` shell command to Ubuntu
-  10.04.
+See `the release notes <http://packages.python.org/python-cloudservers/releases.html>`_.

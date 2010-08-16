@@ -2,6 +2,16 @@
 Release notes
 =============
 
+1.2 (August 15, 2010)
+=====================
+
+* Support for Python 2.4 - 2.7.
+
+* Improved output of :program:`cloudservers ipgroup-list`.
+
+* Made ``cloudservers boot --ipgroup <name>`` work (as well as ``--ipgroup
+  <id>``).
+
 1.1 (May 6, 2010)
 =================
 
