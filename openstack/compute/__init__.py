@@ -1,4 +1,4 @@
-__version__ = '2.0'
+__version__ = '2.0a1'
 
 from openstack.compute.backup_schedules import (BackupSchedule, BackupScheduleManager, 
         BACKUP_WEEKLY_DISABLED, BACKUP_WEEKLY_SUNDAY, BACKUP_WEEKLY_MONDAY,

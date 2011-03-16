@@ -11,7 +11,7 @@ if sys.version_info < (2,6):
 
 setup(
     name = "openstack.compute",
-    version = "2.0",
+    version = "2.0a1",
     description = "Client library for the OpenStack Compute API",
     long_description = read('README.rst'),
     url = 'http://openstack.compute.rtfd.org/',
