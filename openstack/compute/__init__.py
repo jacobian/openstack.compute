@@ -1,5 +1,8 @@
 __version__ = '2.0a1'
 
+import os
+import ConfigParser
+from distutils.util import strtobool
 from openstack.compute.backup_schedules import (BackupSchedule, BackupScheduleManager, 
         BACKUP_WEEKLY_DISABLED, BACKUP_WEEKLY_SUNDAY, BACKUP_WEEKLY_MONDAY,
         BACKUP_WEEKLY_TUESDAY, BACKUP_WEEKLY_WEDNESDAY,
@@ -19,13 +22,15 @@ from openstack.compute.images import ImageManager, Image
 from openstack.compute.ipgroups import IPGroupManager, IPGroup
 from openstack.compute.servers import ServerManager, Server, REBOOT_HARD, REBOOT_SOFT
 
+DEFAULT_CONFIG_FILE = os.path.expanduser('~/.openstack/compute.conf')
+
 class Compute(object):
     """
     Top-level object to access the OpenStack Compute API.
     
     Create an instance with your creds::
     
-    >>> compute = Compute(USERNAME, API_KEY)
+    >>> compute = Compute(username=USERNAME, apikey=API_KEY)
         
     Then call methods on its managers::
     
@@ -37,14 +42,15 @@ class Compute(object):
     &c.
     """
     
-    def __init__(self, username, apikey, auth_url=None, user_agent=None):
+    def __init__(self, **kwargs):
+        self.config = self._get_config(kwargs)
         self.backup_schedules = BackupScheduleManager(self)
-        self.client = ComputeClient(username, apikey, auth_url, user_agent)
+        self.client = ComputeClient(self.config)
         self.flavors = FlavorManager(self)
         self.images = ImageManager(self)
         self.ipgroups = IPGroupManager(self)
         self.servers = ServerManager(self)
-        
+    
     def authenticate(self):
         """
         Authenticate against the server.
@@ -56,3 +62,75 @@ class Compute(object):
         the credentials are wrong.
         """
         self.client.authenticate()
+
+    def _get_config(self, kwargs):
+        """
+        Get a Config object for this API client.
+        
+        Broken out into a seperate method so that the test client can easily
+        mock it up.
+        """
+        return Config(
+            config_file = kwargs.pop('config_file', DEFAULT_CONFIG_FILE),
+            env = kwargs.pop('env', os.environ),
+            overrides = kwargs,
+        )
+
+class Config(object):
+    """
+    Encapsulates getting config from a number of places.
+    
+    Config passed in __init__ overrides config found in the environ, which
+    finally overrides config found in a config file.
+    """
+    
+    DEFAULTS = {
+        'username': None,
+        'apikey': None,
+        'auth_url': "https://auth.api.rackspacecloud.com/v1.0",
+        'user_agent': 'python-openstack-compute/%s' % __version__,
+        'allow_cache': False,
+    }
+    
+    def __init__(self, config_file, env, overrides, env_prefix="OPENSTACK_COMPUTE_"):
+        self.config = self.DEFAULTS.copy()
+        self.update_config_from_file(config_file)
+        self.update_config_from_env(env, env_prefix)
+        self.config.update(overrides)
+        self.apply_fixups()
+        
+    def __getattr__(self, attr):
+        try:
+            return self.config[attr]
+        except KeyError:
+            raise AttributeError(attr)
+    
+    def update_config_from_file(self, config_file):
+        """
+        Update the config from a .ini file.
+        """
+        configparser = ConfigParser.RawConfigParser()
+        if os.path.exists(config_file):
+            configparser.read([config_file])
+        
+        # Mash together a bunch of sections -- "be liberal in what you accept."
+        for section in ('global', 'compute', 'openstack.compute'):
+            if configparser.has_section(section):
+                self.config.update(dict(configparser.items(section)))
+                
+    def update_config_from_env(self, env, env_prefix):
+        """
+        Update the config from the environ.
+        """
+        for key, value in env.iteritems():
+            if key.startswith(env_prefix):
+                key = key.replace(env_prefix, '').lower()
+                self.config[key] = value
+                
+    def apply_fixups(self):
+        """
+        Fix the types of any updates based on the original types in DEFAULTS.
+        """
+        for key, value in self.DEFAULTS.iteritems():
+            if isinstance(value, bool) and not isinstance(self.config[key], bool):
+                self.config[key] = strtobool(self.config[key])

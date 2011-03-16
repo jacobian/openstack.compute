@@ -6,16 +6,27 @@ wrong the tests might fail. I've indicated in comments the places where actual
 behavior differs from the spec.
 """
 
+import mock
 import httplib2
 from nose.tools import assert_equal
-from openstack.compute import Compute
+from openstack.compute import Compute, Config
 from openstack.compute.client import ComputeClient
 from utils import fail, assert_in, assert_not_in, assert_has_keys
 
+class FakeConfig(object):
+    username = "username"
+    apikey = "key"
+    auth_url = "https://auth.api.rackspacecloud.com/v1.0"
+    user_agent = 'python-openstack-compute/test'
+    nocache = True
+
 class FakeServer(Compute):
-    def __init__(self, username=None, password=None):
-        super(FakeServer, self).__init__('username', 'apikey')
+    def __init__(self, **kwargs):
+        super(FakeServer, self).__init__(**kwargs)
         self.client = FakeClient()
+
+    def _get_config(self, kwargs):
+        return FakeConfig()
 
     def assert_called(self, method, url, body=None):
         """

@@ -4,7 +4,7 @@ from nose.tools import assert_raises, assert_equal
 from openstack import compute
 
 def test_authenticate_success():
-    cs = compute.Compute("username", "apikey")
+    cs = compute.Compute(username="username", apikey="apikey")
     auth_response = httplib2.Response({
         'status': 204,
         'x-server-management-url': 'https://servers.api.rackspacecloud.com/v1.0/443470',
@@ -15,11 +15,11 @@ def test_authenticate_success():
     @mock.patch.object(httplib2.Http, "request", mock_request)
     def test_auth_call():
         cs.client.authenticate()
-        mock_request.assert_called_with(cs.client.auth_url, 'GET', 
+        mock_request.assert_called_with(cs.config.auth_url, 'GET', 
             headers = {
                 'X-Auth-User': 'username',
                 'X-Auth-Key': 'apikey',
-                'User-Agent': cs.client.user_agent
+                'User-Agent': cs.config.user_agent
             })
         assert_equal(cs.client.management_url, auth_response['x-server-management-url'])
         assert_equal(cs.client.auth_token, auth_response['x-auth-token'])
@@ -27,7 +27,7 @@ def test_authenticate_success():
     test_auth_call()
 
 def test_authenticate_failure():
-    cs = compute.Compute("username", "apikey")
+    cs = compute.Compute(username="username", apikey="apikey")
     auth_response = httplib2.Response({'status': 401})
     mock_request = mock.Mock(return_value=(auth_response, None))
     
@@ -38,7 +38,7 @@ def test_authenticate_failure():
     test_auth_call()
         
 def test_auth_automatic():
-    client = compute.Compute("username", "apikey").client
+    client = compute.Compute(username="username", apikey="apikey").client
     client.management_url = ''
     mock_request = mock.Mock(return_value=(None, None))
     
@@ -52,7 +52,7 @@ def test_auth_automatic():
     test_auth_call()
     
 def test_auth_manual():
-    cs = compute.Compute("username", "password")
+    cs = compute.Compute(username="username", apikey="apikey")
     
     @mock.patch.object(cs.client, 'authenticate')
     def test_auth_call(m):

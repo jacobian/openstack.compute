@@ -62,14 +62,19 @@ class ComputeShell(object):
             default = False, 
             action = 'store_true',
             help = argparse.SUPPRESS)
-            
+        
+        self.parser.add_argument('-f', '--config-file',
+            metavar = 'PATH',
+            default = None,
+            help = 'Path to config file (default: ~/.openstack/compute.conf)')
         self.parser.add_argument('--username',
-            default = env('OPENSTACK_COMPUTE_USERNAME'),
-            help = 'Defaults to env[OPENSTACK_COMPUTE_USERNAME].')
-            
+            help = 'Account username. Required if not in a config file/environ.')    
         self.parser.add_argument('--apikey',
-            default = env('OPENSTACK_COMPUTE_API_KEY'),
-            help='Defaults to env[OPENSTACK_COMPUTE_API_KEY].')
+            help = 'Account API key. Required if not in a config file/environ.')
+        self.parser.add_argument('--auth-url',
+            help = "Service URL (default: Rackspace's US auth URL)")
+        self.parser.add_argument('--allow-cache',
+            help = "Allow the API to returned cached results.")
         
         # Subcommands
         subparsers = self.parser.add_subparsers(metavar='<subcommand>')
@@ -111,18 +116,24 @@ class ComputeShell(object):
         # Deal with global arguments
         if args.debug:
             httplib2.debuglevel = 1
-           
-        user, apikey = args.username, args.apikey
-        if not user:
-            raise CommandError("You must provide a username, either via "
-                               "--username or via env[OPENSTACK_COMPUTE_USERNAME]")
-        if not apikey:
-            raise CommandError("You must provide an API key, either via "
-                               "--apikey or via env[OPENSTACK_COMPUTE_API_KEY]")
 
-        self.cs = self._api_class(user, apikey)
+        self.compute = self._api_class(
+            config_file = args.config_file,
+            username = args.username,
+            apikey = args.apikey,
+            auth_url = args.auth_url,
+            allow_cache = args.allow_cache,
+        )
+        if not self.compute.config.username:
+            raise CommandError("You must provide a username, either via "
+                               "--username or env[OPENSTACK_COMPUTE_USERNAME], "
+                               "or a config file.")
+        if not self.compute.config.apikey:
+            raise CommandError("You must provide an API key, either via "
+                               "--apikey or via env[OPENSTACK_COMPUTE_APIKEY], "
+                               "or a config file.")
         try:
-            self.cs.authenticate()
+            self.compute.authenticate()
         except compute.Unauthorized:
             raise CommandError("Invalid Cloud Servers credentials.")
         
@@ -211,8 +222,8 @@ class ComputeShell(object):
     @arg('name', metavar='<name>', help='Name for the new server')
     def do_boot(self, args):
         """Boot a new server."""
-        flavor = args.flavor or self.cs.flavors.find(ram=256)
-        image = args.image or self.cs.images.find(name="Ubuntu 10.04 LTS (lucid)")
+        flavor = args.flavor or self.compute.flavors.find(ram=256)
+        image = args.image or self.compute.images.find(name="Ubuntu 10.04 LTS (lucid)")
         
         # Map --ipgroup <name> to an ID.
         # XXX do this for flavor/image?
@@ -251,23 +262,23 @@ class ComputeShell(object):
             except IOError, e:
                 raise CommandError("Can't open '%s': %s" % (keyfile, e))
         
-        server = self.cs.servers.create(args.name, image, flavor, ipgroup, metadata, files)
+        server = self.compute.servers.create(args.name, image, flavor, ipgroup, metadata, files)
         print_dict(server._info)
     
     def do_flavor_list(self, args):
         """Print a list of available 'flavors' (sizes of servers)."""
-        print_list(self.cs.flavors.list(), ['ID', 'Name', 'RAM', 'Disk'])
+        print_list(self.compute.flavors.list(), ['ID', 'Name', 'RAM', 'Disk'])
     
     def do_image_list(self, args):
         """Print a list of available images to boot from."""
-        print_list(self.cs.images.list(), ['ID', 'Name', 'Status'])
+        print_list(self.compute.images.list(), ['ID', 'Name', 'Status'])
 
     @arg('server', metavar='<server>', help='Name or ID of server.')
     @arg('name', metavar='<name>', help='Name for the new image.')
     def do_image_create(self, args):
         """Create a new image by taking a snapshot of a running server."""
         server = self._find_server(args.server)
-        image = self.cs.images.create(args.name, server)
+        image = self.compute.images.create(args.name, server)
         print_dict(image._info)
     
     @arg('image', metavar='<image>', help='Name or ID of image.')    
@@ -300,9 +311,9 @@ class ComputeShell(object):
     def do_ipgroup_list(self, args):
         """Show IP groups."""
         def pretty_server_list(ipgroup):
-            return ", ".join(self.cs.servers.get(id).name for id in ipgroup.servers)
+            return ", ".join(self.compute.servers.get(id).name for id in ipgroup.servers)
             
-        print_list(self.cs.ipgroups.list(), 
+        print_list(self.compute.ipgroups.list(), 
                    fields = ['ID', 'Name', 'Server List'], 
                    formatters = {'Server List': pretty_server_list})
         
@@ -321,7 +332,7 @@ class ComputeShell(object):
             server = self._find_server(args.server)
         else:
             server = None
-        group = self.cs.ipgroups.create(args.name, server)
+        group = self.compute.ipgroups.create(args.name, server)
         print_dict(group._info)
         
     @arg('group', metavar='<group>', help='Name or ID of group.')
@@ -331,7 +342,7 @@ class ComputeShell(object):
     
     def do_list(self, args):
         """List active servers."""
-        print_list(self.cs.servers.list(), ['ID', 'Name', 'Status', 'Public IP', 'Private IP'])
+        print_list(self.compute.servers.list(), ['ID', 'Name', 'Status', 'Public IP', 'Private IP'])
     
     @arg('--hard',
         dest = 'reboot_type',
@@ -391,7 +402,7 @@ class ComputeShell(object):
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_show(self, args):
         """Show details about the given server."""
-        s = self.cs.servers.get(self._find_server(args.server))
+        s = self.compute.servers.get(self._find_server(args.server))
         
         info = s._info.copy()
         addresses = info.pop('addresses')
@@ -410,22 +421,22 @@ class ComputeShell(object):
         
     def _find_server(self, server):
         """Get a server by name or ID."""
-        return self._find_resource(self.cs.servers, server)
+        return self._find_resource(self.compute.servers, server)
     
     def _find_ipgroup(self, group):
         """Get an IP group by name or ID."""
-        return self._find_resource(self.cs.ipgroups, group)
+        return self._find_resource(self.compute.ipgroups, group)
     
     def _find_image(self, image):
         """Get an image by name or ID."""
-        return self._find_resource(self.cs.images, image)
+        return self._find_resource(self.compute.images, image)
     
     def _find_flavor(self, flavor):
         """Get a flavor by name, ID, or RAM size."""
         try:
-            return self._find_resource(self.cs.flavors, flavor)
+            return self._find_resource(self.compute.flavors, flavor)
         except compute.NotFound:
-            return self.cs.flavors.find(ram=flavor)
+            return self.compute.flavors.find(ram=flavor)
     
     def _find_resource(self, manager, name_or_id):
         """Helper for the _find_* methods."""

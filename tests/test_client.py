@@ -2,13 +2,14 @@ import mock
 import httplib2
 from openstack.compute.client import ComputeClient
 from nose.tools import assert_equal
+from fakeserver import FakeConfig
 
 fake_response = httplib2.Response({"status": 200})
 fake_body = '{"hi": "there"}'
 mock_request = mock.Mock(return_value=(fake_response, fake_body))
 
 def client():
-    cl = ComputeClient("username", "apikey")
+    cl = ComputeClient(FakeConfig())
     cl.management_url = "http://example.com"
     cl.auth_token = "token"
     return cl
@@ -21,7 +22,7 @@ def test_get():
     def test_get_call():
         resp, body = cl.get("/hi")
         mock_request.assert_called_with("http://example.com/hi?fresh=1234", "GET", 
-            headers={"X-Auth-Token": "token", "User-Agent": cl.user_agent})
+            headers={"X-Auth-Token": "token", "User-Agent": cl.config.user_agent})
         # Automatic JSON parsing
         assert_equal(body, {"hi":"there"})
 
@@ -37,7 +38,7 @@ def test_post():
             headers = {
                 "X-Auth-Token": "token",
                 "Content-Type": "application/json",
-                "User-Agent": cl.user_agent},
+                "User-Agent": cl.config.user_agent},
             body = '[1, 2, 3]'
         )
     

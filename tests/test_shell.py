@@ -11,7 +11,7 @@ def setup():
     global _old_env
     fake_env = {
         'OPENSTACK_COMPUTE_USERNAME': 'username',
-        'OPENSTACK_COMPUTE_API_KEY': 'password'
+        'OPENSTACK_COMPUTE_APIKEY': 'password'
     }
     _old_env, os.environ = os.environ, fake_env.copy()
 
@@ -20,7 +20,7 @@ def setup():
     global shell, _shell, assert_called
     _shell = ComputeShell()
     _shell._api_class = FakeServer
-    assert_called = lambda m, u, b=None: _shell.cs.assert_called(m, u, b)
+    assert_called = lambda m, u, b=None: _shell.compute.assert_called(m, u, b)
     shell = lambda cmd: _shell.main(cmd.split())
 
 def teardown():
@@ -184,7 +184,7 @@ def test_ip_unshare():
     
 def test_ipgroup_list():
     shell('ipgroup-list')
-    assert_in(('GET', '/shared_ip_groups/detail', None), _shell.cs.client.callstack)
+    assert_in(('GET', '/shared_ip_groups/detail', None), _shell.compute.client.callstack)
     assert_called('GET', '/servers/5678')
     
 def test_ipgroup_show():
