@@ -21,7 +21,7 @@ def test_get():
     def test_get_call():
         resp, body = cl.get("/hi")
         mock_request.assert_called_with("http://example.com/hi?fresh=1234", "GET", 
-            headers={"X-Auth-Token": "token", "User-Agent": cl.USER_AGENT})
+            headers={"X-Auth-Token": "token", "User-Agent": cl.user_agent})
         # Automatic JSON parsing
         assert_equal(body, {"hi":"there"})
 
@@ -37,7 +37,7 @@ def test_post():
             headers = {
                 "X-Auth-Token": "token",
                 "Content-Type": "application/json",
-                "User-Agent": cl.USER_AGENT},
+                "User-Agent": cl.user_agent},
             body = '[1, 2, 3]'
         )
     

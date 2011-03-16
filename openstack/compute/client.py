@@ -14,13 +14,15 @@ if not hasattr(urlparse, 'parse_qsl'):
 
 from openstack.compute import exceptions, __version__
 
+DEFAULT_AUTH_URL = "https://auth.api.rackspacecloud.com/v1.0"
+DEFAULT_USER_AGENT = 'python-openstack-compute/%s' % __version__
+
 class ComputeClient(httplib2.Http):
     
-    AUTH_URL = 'https://auth.api.rackspacecloud.com/v1.0'
-    USER_AGENT = 'python-openstack-compute/%s' % __version__
-    
-    def __init__(self, user, apikey):
+    def __init__(self, user, apikey, auth_url=None, user_agent=None):
         super(ComputeClient, self).__init__()
+        self.auth_url = auth_url or DEFAULT_AUTH_URL
+        self.user_agent = user_agent or DEFAULT_USER_AGENT
         self.user = user
         self.apikey = apikey
         
@@ -32,7 +34,7 @@ class ComputeClient(httplib2.Http):
 
     def request(self, *args, **kwargs):
         kwargs.setdefault('headers', {})
-        kwargs['headers']['User-Agent'] = self.USER_AGENT
+        kwargs['headers']['User-Agent'] = self.user_agent
         if 'body' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['body'] = json.dumps(kwargs['body'])
@@ -82,7 +84,7 @@ class ComputeClient(httplib2.Http):
 
     def authenticate(self):
         headers = {'X-Auth-User': self.user, 'X-Auth-Key': self.apikey}
-        resp, body = self.request(self.AUTH_URL, 'GET', headers=headers)
+        resp, body = self.request(self.auth_url, 'GET', headers=headers)
         self.management_url = resp['x-server-management-url']
         self.auth_token = resp['x-auth-token']
         

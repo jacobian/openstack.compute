@@ -37,9 +37,9 @@ class Compute(object):
     &c.
     """
     
-    def __init__(self, username, apikey):
+    def __init__(self, username, apikey, auth_url=None, user_agent=None):
         self.backup_schedules = BackupScheduleManager(self)
-        self.client = ComputeClient(username, apikey)
+        self.client = ComputeClient(username, apikey, auth_url, user_agent)
         self.flavors = FlavorManager(self)
         self.images = ImageManager(self)
         self.ipgroups = IPGroupManager(self)
