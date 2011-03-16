@@ -1,14 +1,14 @@
 Exceptions
 ==========
 
-.. currentmodule:: cloudservers
+.. currentmodule:: openstack.compute
 
 Exceptions
 ----------
 
 Exceptions that the API might throw:
 
-.. automodule:: cloudservers
-   :members: CloudServersException, BadRequest, Unauthorized, Forbidden, 
+.. automodule:: openstack.compute
+   :members: ComputeException, BadRequest, Unauthorized, Forbidden, 
              NotFound, OverLimit
 

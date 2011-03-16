@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# python-cloudservers documentation build configuration file, created by
+# openstack.computedoc documentation build configuration file, created by
 # sphinx-quickstart on Sun Dec  6 14:19:25 2009.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -37,7 +37,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'python-cloudservers'
+project = u'openstack.compute'
 copyright = u'Jacob Kaplan-Moss'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -91,7 +91,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'nature'
+# html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -158,7 +158,7 @@ html_static_path = ['_static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'python-cloudserversdoc'
+htmlhelp_basename = 'openstack.computedoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -172,7 +172,7 @@ htmlhelp_basename = 'python-cloudserversdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'python-cloudservers.tex', u'python-cloudservers Documentation',
+  ('index', 'openstack.compute.tex', u'openstack.compute Documentation',
    u'Jacob Kaplan-Moss', 'manual'),
 ]
 

@@ -1,7 +1,7 @@
 Images
 ======
 
-.. currentmodule:: cloudservers
+.. currentmodule:: openstack.compute
 
 An "image" is a snapshot from which you can create new server instances.
 

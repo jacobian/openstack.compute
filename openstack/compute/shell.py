@@ -1,22 +1,21 @@
 """
-Command-line interface to the Cloud Servers API.
+Command-line interface to the OpenStack Compute API.
 """
 
 import argparse
-import cloudservers
 import getpass
 import httplib2
 import os
 import prettytable
 import sys
-import textwrap
+from openstack import compute
 
 # Choices for flags.
-DAY_CHOICES = [getattr(cloudservers, i).lower() 
-               for i in dir(cloudservers)
+DAY_CHOICES = [getattr(compute, i).lower() 
+               for i in dir(compute)
                if i.startswith('BACKUP_WEEKLY_')]
-HOUR_CHOICES = [getattr(cloudservers, i).lower()
-                for i in dir(cloudservers)
+HOUR_CHOICES = [getattr(compute, i).lower()
+                for i in dir(compute)
                 if i.startswith('BACKUP_DAILY_')]
 
 def pretty_choice_list(l): return ', '.join("'%s'" % i for i in l)
@@ -39,18 +38,18 @@ class CommandError(Exception):
 def env(e):
     return os.environ.get(e, '')
 
-class CloudserversShell(object):
+class ComputeShell(object):
     
     # Hook for the test suite to inject a fake server.
-    _api_class = cloudservers.CloudServers
+    _api_class = compute.Compute
     
     def __init__(self):
         self.parser = argparse.ArgumentParser(
-            prog = 'cloudservers',
+            prog = 'openstack-compute',
             description = __doc__.strip(),
-            epilog = 'See "cloudservers help COMMAND" for help on a specific command.',
+            epilog = 'See "openstack-compute help COMMAND" for help on a specific command.',
             add_help = False,
-            formatter_class = CloudserversHelpFormatter,
+            formatter_class = ComputeHelpFormatter,
         )
         
         # Global arguments        
@@ -65,12 +64,12 @@ class CloudserversShell(object):
             help = argparse.SUPPRESS)
             
         self.parser.add_argument('--username',
-            default = env('CLOUD_SERVERS_USERNAME'),
-            help = 'Defaults to env[CLOUD_SERVERS_USERNAME].')
+            default = env('OPENSTACK_COMPUTE_USERNAME'),
+            help = 'Defaults to env[OPENSTACK_COMPUTE_USERNAME].')
             
         self.parser.add_argument('--apikey',
-            default = env('CLOUD_SERVERS_API_KEY'),
-            help='Defaults to env[CLOUD_SERVERS_API_KEY].')
+            default = env('OPENSTACK_COMPUTE_API_KEY'),
+            help='Defaults to env[OPENSTACK_COMPUTE_API_KEY].')
         
         # Subcommands
         subparsers = self.parser.add_subparsers(metavar='<subcommand>')
@@ -89,7 +88,7 @@ class CloudserversShell(object):
                 help = help,
                 description = desc,
                 add_help=False,
-                formatter_class = CloudserversHelpFormatter
+                formatter_class = ComputeHelpFormatter
             )
             subparser.add_argument('-h', '--help',
                 action = 'help',
@@ -116,15 +115,15 @@ class CloudserversShell(object):
         user, apikey = args.username, args.apikey
         if not user:
             raise CommandError("You must provide a username, either via "
-                               "--username or via env[CLOUD_SERVERS_USERNAME]")
+                               "--username or via env[OPENSTACK_COMPUTE_USERNAME]")
         if not apikey:
             raise CommandError("You must provide an API key, either via "
-                               "--apikey or via env[CLOUD_SERVERS_API_KEY]")
+                               "--apikey or via env[OPENSTACK_COMPUTE_API_KEY]")
 
         self.cs = self._api_class(user, apikey)
         try:
             self.cs.authenticate()
-        except cloudservers.Unauthorized:
+        except compute.Unauthorized:
             raise CommandError("Invalid Cloud Servers credentials.")
         
         args.func(args)
@@ -161,9 +160,9 @@ class CloudserversShell(object):
         # If we have some flags, update the backup
         backup = {}
         if args.daily:
-            backup['daily'] = getattr(cloudservers, 'BACKUP_DAILY_%s' % args.daily.upper())
+            backup['daily'] = getattr(compute, 'BACKUP_DAILY_%s' % args.daily.upper())
         if args.weekly:
-            backup['weekly'] = getattr(cloudservers, 'BACKUP_WEEKLY_%s' % args.weekly.upper())
+            backup['weekly'] = getattr(compute, 'BACKUP_WEEKLY_%s' % args.weekly.upper())
         if args.enabled is not None:
             backup['enabled'] = args.enabled
         if backup:
@@ -337,8 +336,8 @@ class CloudserversShell(object):
     @arg('--hard',
         dest = 'reboot_type',
         action = 'store_const',
-        const = cloudservers.REBOOT_HARD,
-        default = cloudservers.REBOOT_SOFT,
+        const = compute.REBOOT_HARD,
+        default = compute.REBOOT_SOFT,
         help = 'Perform a hard reboot (instead of a soft one).')
     @arg('server', metavar='<server>', help='Name or ID of server.')
     def do_reboot(self, args):
@@ -425,7 +424,7 @@ class CloudserversShell(object):
         """Get a flavor by name, ID, or RAM size."""
         try:
             return self._find_resource(self.cs.flavors, flavor)
-        except cloudservers.NotFound:
+        except compute.NotFound:
             return self.cs.flavors.find(ram=flavor)
     
     def _find_resource(self, manager, name_or_id):
@@ -435,16 +434,16 @@ class CloudserversShell(object):
                 return manager.get(int(name_or_id))
             else:
                 return manager.find(name=name_or_id)
-        except cloudservers.NotFound:
+        except compute.NotFound:
             raise CommandError("No %s with a name or ID of '%s' exists."
                                % (manager.resource_class.__name__.lower(), name_or_id))
 
 # I'm picky about my shell help.
-class CloudserversHelpFormatter(argparse.HelpFormatter):
+class ComputeHelpFormatter(argparse.HelpFormatter):
     def start_section(self, heading):
         # Title-case the headings
         heading = '%s%s' % (heading[0].upper(), heading[1:])
-        super(CloudserversHelpFormatter, self).start_section(heading)
+        super(ComputeHelpFormatter, self).start_section(heading)
 
 # Helpers
 def print_list(objs, fields, formatters={}):
@@ -470,7 +469,7 @@ def print_dict(d):
 
 def main():
     try:
-        CloudserversShell().main(sys.argv[1:])
+        ComputeShell().main(sys.argv[1:])
     except CommandError, e:
         print >> sys.stderr, e
         sys.exit(1)

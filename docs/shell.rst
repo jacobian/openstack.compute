@@ -1,40 +1,45 @@
-The :program:`cloudservers` shell utility
-=========================================
+The :program:`openstack-compute` shell utility
+==============================================
 
-.. program:: cloudservers
+.. program:: openstack-compute
 .. highlight:: bash
 
-The :program:`cloudservers` shell utility interacts with Rackspace Cloud servers
-from the command line. It supports the entirety of the Cloud Servers API,
-including some commands not available from the Rackspace web console.
+The :program:`openstack-compute` shell utility interacts with OpenStack
+Compute servers from the command line. It supports the entirety of the
+OpenStack Compute API (plus a few Rackspace-specific additions), including
+some commands not available from the Rackspace web console.
 
-First, you'll need a Rackspace Cloud Servers account and an API key. At the time
-of this writing getting an API key is non-obvious: you need to sign up for
-*both* Cloud Servers *and* Cloud Files; only then can you grab an API key from
-the Rackspace web console.
+To try this out, you'll need a `Rackspace Cloud`__ account — or your own
+install of OpenStack Compute (also known as Nova). If you're using Rackspace
+you'll need to make sure to sign up for both Cloud Servers *and* Cloud Files
+-- Rackspace won't let you get an API key unless you've got a Cloud Files
+account, too. Once you've got an account, you'll find your API key in the
+management console under "Your Account".
 
-You'll need to provide :program:`cloudservers` with your Rackspace username and
-API key. You can do this with the :option:`--username` and :option:`--apikey`
-options, but it's easier to just set them as environment variables by setting
-two environment variables:
+__ http://rackspacecloud.com/
 
-.. envvar:: CLOUD_SERVERS_USERNAME
+You'll need to provide :program:`openstack-compute` with your Rackspace
+username and API key. You can do this with the :option:`--username` and
+:option:`--apikey` options, but it's easier to just set them as environment
+variables by setting two environment variables:
+
+.. envvar:: OPENSTACK_COMPUTE_USERNAME
 
     Your Rackspace Cloud username.
 
-.. envvar:: CLOUD_SERVERS_API_KEY
+.. envvar:: OPENSTACK_COMPUTE_API_KEY
 
     Your API key.
 
 For example, in Bash you'd use::
 
-    export CLOUD_SERVERS_USERNAME=yourname
-    export CLOUD_SERVERS_API_KEY=yadayadayada
+    export COPENSTACK_COMPUTE_USERNAME=yourname
+    export COPENSTACK_COMPUTE_API_KEY=yadayadayada
     
 From there, all shell commands take the form::
     
-    cloudservers <command> [arguments...]
+    openstack-compute <command> [arguments...]
 
-Run :program:`cloudservers help` to get a full list of all possible commands,
-and run :program:`cloudservers help <command>` to get detailed help for that
-command.
+Run :program:`openstack-compute help` to get a full list of all possible
+commands, and run :program:`openstack-compute help <command>` to get detailed
+help for that command.

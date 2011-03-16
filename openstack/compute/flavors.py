@@ -1,4 +1,4 @@
-from cloudservers import base
+from openstack.compute import base
 
 class Flavor(base.Resource):
     """

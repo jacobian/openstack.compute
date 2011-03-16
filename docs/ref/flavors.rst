@@ -10,7 +10,7 @@ From Rackspace's API documentation:
 Classes
 -------
 
-.. currentmodule:: cloudservers
+.. currentmodule:: openstack.compute
 
 .. autoclass:: FlavorManager
    :members: get, list, find, findall

@@ -1,6 +1,6 @@
-__version__ = '1.2'
+__version__ = '2.0'
 
-from cloudservers.backup_schedules import (BackupSchedule, BackupScheduleManager, 
+from openstack.compute.backup_schedules import (BackupSchedule, BackupScheduleManager, 
         BACKUP_WEEKLY_DISABLED, BACKUP_WEEKLY_SUNDAY, BACKUP_WEEKLY_MONDAY,
         BACKUP_WEEKLY_TUESDAY, BACKUP_WEEKLY_WEDNESDAY,
         BACKUP_WEEKLY_THURSDAY, BACKUP_WEEKLY_FRIDAY, BACKUP_WEEKLY_SATURDAY,
@@ -11,27 +11,27 @@ from cloudservers.backup_schedules import (BackupSchedule, BackupScheduleManager
         BACKUP_DAILY_H_1400_1600, BACKUP_DAILY_H_1600_1800,
         BACKUP_DAILY_H_1800_2000, BACKUP_DAILY_H_2000_2200,
         BACKUP_DAILY_H_2200_0000)
-from cloudservers.client import CloudServersClient
-from cloudservers.exceptions import (CloudServersException, BadRequest, Unauthorized,
+from openstack.compute.client import ComputeClient
+from openstack.compute.exceptions import (ComputeException, BadRequest, Unauthorized,
     Forbidden, NotFound, OverLimit)
-from cloudservers.flavors import FlavorManager, Flavor
-from cloudservers.images import ImageManager, Image
-from cloudservers.ipgroups import IPGroupManager, IPGroup
-from cloudservers.servers import ServerManager, Server, REBOOT_HARD, REBOOT_SOFT
+from openstack.compute.flavors import FlavorManager, Flavor
+from openstack.compute.images import ImageManager, Image
+from openstack.compute.ipgroups import IPGroupManager, IPGroup
+from openstack.compute.servers import ServerManager, Server, REBOOT_HARD, REBOOT_SOFT
 
-class CloudServers(object):
+class Compute(object):
     """
-    Top-level object to access the Rackspace Cloud Servers API.
+    Top-level object to access the OpenStack Compute API.
     
     Create an instance with your creds::
     
-        >>> cs = CloudServers(USERNAME, API_KEY)
+    >>> compute = Compute(USERNAME, API_KEY)
         
     Then call methods on its managers::
     
-        >>> cs.servers.list()
+        >>> compute.servers.list()
         ...
-        >>> cs.flavors.list()
+        >>> compute.flavors.list()
         ...
         
     &c.
@@ -39,7 +39,7 @@ class CloudServers(object):
     
     def __init__(self, username, apikey):
         self.backup_schedules = BackupScheduleManager(self)
-        self.client = CloudServersClient(username, apikey)
+        self.client = ComputeClient(username, apikey)
         self.flavors = FlavorManager(self)
         self.images = ImageManager(self)
         self.ipgroups = IPGroupManager(self)
@@ -52,7 +52,7 @@ class CloudServers(object):
         Normally this is called automatically when you first access the API,
         but you can call this method to force authentication right now.
         
-        Returns on success; raises :exc:`cloudservers.Unauthorized` if the
-        credentials are wrong.
+        Returns on success; raises :exc:`~openstack.compute.Unauthorized` if
+        the credentials are wrong.
         """
         self.client.authenticate()

@@ -1,4 +1,4 @@
-from cloudservers import base
+from openstack.compute import base
 
 class IPGroup(base.Resource):
     def __repr__(self):

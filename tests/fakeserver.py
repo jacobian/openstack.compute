@@ -7,14 +7,12 @@ behavior differs from the spec.
 """
 
 import httplib2
-import urlparse
-import urllib
 from nose.tools import assert_equal
-from cloudservers import CloudServers
-from cloudservers.client import CloudServersClient
+from openstack.compute import Compute
+from openstack.compute.client import ComputeClient
 from utils import fail, assert_in, assert_not_in, assert_has_keys
 
-class FakeServer(CloudServers):
+class FakeServer(Compute):
     def __init__(self, username=None, password=None):
         super(FakeServer, self).__init__('username', 'apikey')
         self.client = FakeClient()
@@ -38,7 +36,7 @@ class FakeServer(CloudServers):
     def authenticate(self):
         pass
 
-class FakeClient(CloudServersClient):
+class FakeClient(ComputeClient):
     def __init__(self):
         self.username = 'username'
         self.apikey = 'apikey'

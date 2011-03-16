@@ -6,7 +6,7 @@ A virtual machine instance.
 Classes
 -------
 
-.. currentmodule:: cloudservers
+.. currentmodule:: openstack.compute
 
 .. autoclass:: ServerManager
    :members: get, list, find, findall, create, update, delete, share_ip,

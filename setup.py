@@ -10,11 +10,11 @@ if sys.version_info < (2,6):
     requirements.append('simplejson')
 
 setup(
-    name = "python-cloudservers",
-    version = "1.2",
-    description = "Client library for Rackspace's Cloud Servers API",
+    name = "openstack.compute",
+    version = "2.0",
+    description = "Client library for the OpenStack Compute API",
     long_description = read('README.rst'),
-    url = 'http://packages.python.org/python-cloudservers',
+    url = 'http://openstack.compute.rtfd.org/',
     license = 'BSD',
     author = 'Jacob Kaplan-Moss',
     author_email = 'jacob@jacobian.org',
@@ -28,12 +28,13 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
+    namespace_packages = ["openstack"],
     install_requires = requirements,
     
     tests_require = ["nose", "mock"],
     test_suite = "nose.collector",
     
     entry_points = {
-        'console_scripts': ['cloudservers = cloudservers.shell:main']
+        'console_scripts': ['openstack-compute = openstack.compute.shell:main']
     }
 )

@@ -1,4 +1,4 @@
-from cloudservers import base
+from openstack.compute import base
 
 BACKUP_WEEKLY_DISABLED  = 'DISABLED'
 BACKUP_WEEKLY_SUNDAY    = 'SUNDAY'

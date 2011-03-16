@@ -1,22 +1,22 @@
-The :mod:`cloudservers` Python API
-==================================
+The :mod:`openstack.compute` Python API
+=======================================
 
-.. module:: cloudservers
-   :synopsis: A client for the Rackspace Cloud Servers API.
+.. module:: openstack.compute
+   :synopsis: A client for the OpenStack Compute API.
    
-.. currentmodule:: cloudservers
+.. currentmodule:: openstack.compute
 
 Usage
 -----
 
-First create an instance of :class:`CloudServers` with your credentials::
+First create an instance of :class:`Compute` with your credentials::
 
-    >>> from cloudservers import CloudServers
-    >>> cloudservers = CloudServers(USERNAME, API_KEY)
+    >>> from openstack.compute import Compute
+    >>> compute = Compute(USERNAME, API_KEY)
 
-Then call methods on the :class:`CloudServers` object:
+Then call methods on the :class:`Compute` object:
 
-.. class:: CloudServers
+.. class:: Compute
     
     .. attribute:: backup_schedules
     
@@ -43,10 +43,10 @@ Then call methods on the :class:`CloudServers` object:
 
 For example::
 
-    >>> cloudservers.servers.list()
+    >>> compute.servers.list()
     [<Server: buildslave-ubuntu-9.10>]
 
-    >>> cloudservers.flavors.list()
+    >>> compute.flavors.list()
     [<Flavor: 256 server>,
      <Flavor: 512 server>,
      <Flavor: 1GB server>,
@@ -55,7 +55,7 @@ For example::
      <Flavor: 8GB server>,
      <Flavor: 15.5GB server>]
 
-    >>> fl = cloudservers.flavors.find(ram=512)
+    >>> fl = compute.flavors.find(ram=512)
     >>> cloudservers.servers.create("my-server", flavor=fl)
     <Server: my-server>
 

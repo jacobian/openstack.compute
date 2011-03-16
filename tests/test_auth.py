@@ -1,10 +1,10 @@
 import mock
-import cloudservers
 import httplib2
 from nose.tools import assert_raises, assert_equal
+from openstack import compute
 
 def test_authenticate_success():
-    cs = cloudservers.CloudServers("username", "apikey")
+    cs = compute.Compute("username", "apikey")
     auth_response = httplib2.Response({
         'status': 204,
         'x-server-management-url': 'https://servers.api.rackspacecloud.com/v1.0/443470',
@@ -27,18 +27,18 @@ def test_authenticate_success():
     test_auth_call()
 
 def test_authenticate_failure():
-    cs = cloudservers.CloudServers("username", "apikey")
+    cs = compute.Compute("username", "apikey")
     auth_response = httplib2.Response({'status': 401})
     mock_request = mock.Mock(return_value=(auth_response, None))
     
     @mock.patch.object(httplib2.Http, "request", mock_request)
     def test_auth_call():
-        assert_raises(cloudservers.Unauthorized, cs.client.authenticate)
+        assert_raises(compute.Unauthorized, cs.client.authenticate)
         
     test_auth_call()
         
 def test_auth_automatic():
-    client = cloudservers.CloudServers("username", "apikey").client
+    client = compute.Compute("username", "apikey").client
     client.management_url = ''
     mock_request = mock.Mock(return_value=(None, None))
     
@@ -52,7 +52,7 @@ def test_auth_automatic():
     test_auth_call()
     
 def test_auth_manual():
-    cs = cloudservers.CloudServers("username", "password")
+    cs = compute.Compute("username", "password")
     
     @mock.patch.object(cs.client, 'authenticate')
     def test_auth_call(m):

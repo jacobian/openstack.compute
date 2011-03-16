@@ -1,9 +1,9 @@
 
 import mock
-import cloudservers.base
-from cloudservers import Flavor
-from cloudservers.exceptions import NotFound
-from cloudservers.base import Resource
+import openstack.compute.base
+from openstack.compute import Flavor
+from openstack.compute.exceptions import NotFound
+from openstack.compute.base import Resource
 from nose.tools import assert_equal, assert_not_equal, assert_raises
 from fakeserver import FakeServer
 
@@ -14,10 +14,10 @@ def test_resource_repr():
     assert_equal(repr(r), "<Resource baz=spam, foo=bar>")
     
 def test_getid():
-    assert_equal(cloudservers.base.getid(4), 4)
+    assert_equal(openstack.compute.base.getid(4), 4)
     class O(object):
         id = 4
-    assert_equal(cloudservers.base.getid(O), 4)
+    assert_equal(openstack.compute.base.getid(O), 4)
     
 def test_resource_lazy_getattr():
     f = Flavor(cs.flavors, {'id': 1})

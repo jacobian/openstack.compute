@@ -2,6 +2,23 @@
 Release notes
 =============
 
+2.0 (TBD)
+=========
+
+* **Major renaming**: the library is now called ``openstack.compute`` to
+  reflect that Rackspace Cloud is just one instance of the open source
+  project. This ripples to a lot of places:
+  
+    * The library is now called ``openstack.compute`` instead of
+      ``cloudservers``, and the main API entry point is now
+      ``openstack.compute.Compute`` instead of ``cloudservers.CloudServers``.
+
+    * The shell program is now ``openstack-compute`` instead of
+      ``cloudservers``. Yes, the name's a lot longer. Use ``alias``.
+      
+    * The env variables are now ``OPENSTACK_COMPUTE_USERNAME`` and
+      ``OPENSTACK_COMPUTE_API_KEY``.
+
 1.2 (August 15, 2010)
 =====================
 

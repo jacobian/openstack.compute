@@ -12,16 +12,15 @@ if not hasattr(urlparse, 'parse_qsl'):
     import cgi
     urlparse.parse_qsl = cgi.parse_qsl
 
-import cloudservers
-from cloudservers import exceptions
+from openstack.compute import exceptions, __version__
 
-class CloudServersClient(httplib2.Http):
+class ComputeClient(httplib2.Http):
     
     AUTH_URL = 'https://auth.api.rackspacecloud.com/v1.0'
-    USER_AGENT = 'python-cloudservers/%s' % cloudservers.__version__
+    USER_AGENT = 'python-openstack-compute/%s' % __version__
     
     def __init__(self, user, apikey):
-        super(CloudServersClient, self).__init__()
+        super(ComputeClient, self).__init__()
         self.user = user
         self.apikey = apikey
         
@@ -38,7 +37,7 @@ class CloudServersClient(httplib2.Http):
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['body'] = json.dumps(kwargs['body'])
             
-        resp, body = super(CloudServersClient, self).request(*args, **kwargs)
+        resp, body = super(ComputeClient, self).request(*args, **kwargs)
         if body:
             body = json.loads(body)
         else:
