@@ -1,13 +1,14 @@
 Python bindings to the Rackspace Cloud Servers API
 ==================================================
 
-This is a client for Rackspace's Cloud Servers API. There's a Python API (the
-``cloudservers`` module), and a command-line script (``cloudservers``). Each
-implements 100% of the Rackspace API.
+This is a client for the OpenStack Compute API used by Rackspace Cloud and
+others. There's a Python API (the ```openstack.compute`` module), and a
+command-line program (installed as ``openstack-compute``). Each implements the
+entire OpenStack Compute API (as well as a few Rackspace-only addons).
 
 `Full documentation is available`__.
 
-__ http://packages.python.org/python-cloudservers/
+__ http://openstackcompute.rtfd.org/
 
 You'll also probably want to read `Rackspace's API guide`__ (PDF) -- the first
 bit, at least -- to get an idea of the concepts. Rackspace is doing the cloud
@@ -18,7 +19,7 @@ __ http://docs.rackspacecloud.com/servers/api/cs-devguide-latest.pdf
 
 Development takes place on GitHub__. Bug reports and patches may be filed there.
 
-__ http://github.com/jacobian/python-cloudservers
+__ http://github.com/jacobian/openstack.compute
 
 .. contents:: Contents:
    :local:
@@ -26,22 +27,22 @@ __ http://github.com/jacobian/python-cloudservers
 Command-line API
 ----------------
 
-Installing this package gets you a shell command, ``cloudservers``, that you
-can use to interact with Rackspace.
+Installing this package gets you a shell command, ``openstack-compute``, that
+you can use to interact with Rackspace.
 
 You'll need to provide your Rackspace username and API key. You can do this
 with the ``--username`` and ``--apikey`` params, but it's easier to just set
 them as environment variables::
 
-    export CLOUD_SERVERS_USERNAME=jacobian
-    export CLOUD_SERVERS_API_KEY=yadayada
+    export OPENSTACK_COMPUTE_USERNAME=jacobian
+    export OPENSTACK_COMPUTE_API_KEY=yadayada
     
 You'll find complete documentation on the shell by running 
 ``cloudservers help``::
     
-    usage: cloudservers [--username USERNAME] [--apikey APIKEY] <subcommand> ...
+    usage: openstack-compute [--username USERNAME] [--apikey APIKEY] <subcommand> ...
 
-    Command-line interface to the Cloud Servers API.
+    Command-line interface to the OpenStack Compute API.
 
     Positional arguments:
       <subcommand>
@@ -77,27 +78,27 @@ You'll find complete documentation on the shell by running
         show                Show details about the given server.
 
     Optional arguments:
-      --username USERNAME   Defaults to env[CLOUD_SERVERS_USERNAME].
-      --apikey APIKEY       Defaults to env[CLOUD_SERVERS_API_KEY].
+      --username USERNAME   Defaults to env[OPENSTACK_COMPUTE_USERNAME].
+      --apikey APIKEY       Defaults to env[OPENSTACK_COMPUTE_API_KEY].
 
-    See "cloudservers help COMMAND" for help on a specific command.
+    See "openstack-compute help COMMAND" for help on a specific command.
     
 Python API
 ----------
 
 There's also a `complete Python API`__.
 
-__ http://packages.python.org/python-cloudservers/
+__ http://openstack-compute.rtfd.org/
 
 By way of a quick-start::
 
-    >>> import cloudservers
-    >>> cs = cloudservers.CloudServers(USERNAME, API_KEY)
-    >>> cs.flavors.list()
+    >>> import openstack.compute
+    >>> compute = openstack.compute.Compute(USERNAME, API_KEY)
+    >>> compute.flavors.list()
     [...]
-    >>> cs.servers.list()
+    >>> compute.servers.list()
     [...]
-    >>> s = cs.servers.create(image=2, flavor=1, name='myserver')
+    >>> s = compute.servers.create(image=2, flavor=1, name='myserver')
     
     ... time passes ...
     
@@ -113,11 +114,11 @@ FAQ
 What's wrong with libcloud?
 
     Nothing! However, as a cross-service binding it's by definition lowest
-    common denominator; I needed access to the Rackspace-specific APIs (shared
+    common denominator; I needed access to the OpenStack-specific APIs (shared
     IP groups, image snapshots, resizing, etc.). I also wanted a command-line
     utility.
     
 What's new?
 -----------
 
-See `the release notes <http://packages.python.org/python-cloudservers/releases.html>`_.
+See `the release notes <http://openstackcompute.readthedocs.org/en/latest/releases.html>`_.

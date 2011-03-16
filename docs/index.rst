@@ -1,8 +1,8 @@
 Python bindings to the OpenStack Compute API
 ============================================
 
-This is a client for Rackspace's OpenStack Compute API used by Rackspace Cloud
-and others.. There's :doc:`a Python API <api>` (the :mod:`openstack.compute`
+This is a client for the OpenStack Compute API used by Rackspace Cloud and
+others. There's :doc:`a Python API <api>` (the :mod:`openstack.compute`
 module), and a :doc:`command-line script <shell>` (installed as
 :program:`openstack-compute`). Each implements the entire OpenStack Compute
 API (as well as a few Rackspace-only addons).
