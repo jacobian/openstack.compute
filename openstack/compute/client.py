@@ -86,15 +86,19 @@ class ComputeClient(httplib2.Http):
         
     def _munge_get_url(self, url):
         """
-        Munge GET URLs to always return uncached content.
+        Munge GET URLs to always return uncached content if
+        self.config.allow_cache is False (the default).
         
         The Cloud Servers API caches data *very* agressively and doesn't respect
         cache headers. To avoid stale data, then, we append a little bit of
         nonsense onto GET parameters; this appears to force the data not to be
         cached.
         """
-        scheme, netloc, path, query, frag = urlparse.urlsplit(url)
-        query = urlparse.parse_qsl(query)
-        query.append(('fresh', str(time.time())))
-        query = urllib.urlencode(query)
-        return urlparse.urlunsplit((scheme, netloc, path, query, frag))
+        if self.config.allow_cache:
+            return url
+        else:
+            scheme, netloc, path, query, frag = urlparse.urlsplit(url)
+            query = urlparse.parse_qsl(query)
+            query.append(('fresh', str(time.time())))
+            query = urllib.urlencode(query)
+            return urlparse.urlunsplit((scheme, netloc, path, query, frag))

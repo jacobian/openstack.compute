@@ -18,7 +18,7 @@ class FakeConfig(object):
     apikey = "key"
     auth_url = "https://auth.api.rackspacecloud.com/v1.0"
     user_agent = 'python-openstack-compute/test'
-    nocache = True
+    allow_cache = False
 
 class FakeServer(Compute):
     def __init__(self, **kwargs):

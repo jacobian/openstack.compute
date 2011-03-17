@@ -71,8 +71,8 @@ class Compute(object):
         mock it up.
         """
         return Config(
-            config_file = kwargs.pop('config_file', DEFAULT_CONFIG_FILE),
-            env = kwargs.pop('env', os.environ),
+            config_file = kwargs.pop('config_file', None),
+            env = kwargs.pop('env', None),
             overrides = kwargs,
         )
 
@@ -93,10 +93,13 @@ class Config(object):
     }
     
     def __init__(self, config_file, env, overrides, env_prefix="OPENSTACK_COMPUTE_"):
+        config_file = config_file or DEFAULT_CONFIG_FILE
+        env = env or os.environ
+        
         self.config = self.DEFAULTS.copy()
         self.update_config_from_file(config_file)
         self.update_config_from_env(env, env_prefix)
-        self.config.update(overrides)
+        self.config.update(dict((k,v) for (k,v) in overrides.items() if v is not None))
         self.apply_fixups()
         
     def __getattr__(self, attr):

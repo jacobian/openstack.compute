@@ -28,6 +28,19 @@ def test_get():
 
     test_get_call()
 
+def test_get_allow_cache():
+    cl = client()
+    cl.config.allow_cache = True
+    
+    @mock.patch.object(httplib2.Http, "request", mock_request)
+    def test_get_call():
+        resp, body = cl.get("/hi")
+        # No ?fresh because we're allowing caching.
+        mock_request.assert_called_with("http://example.com/hi", "GET", 
+            headers={"X-Auth-Token": "token", "User-Agent": cl.config.user_agent})
+
+    test_get_call()
+    
 def test_post():
     cl = client()
     

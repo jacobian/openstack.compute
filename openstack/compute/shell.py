@@ -74,6 +74,8 @@ class ComputeShell(object):
         self.parser.add_argument('--auth-url',
             help = "Service URL (default: Rackspace's US auth URL)")
         self.parser.add_argument('--allow-cache',
+            action = 'store_true',
+            default = False,
             help = "Allow the API to returned cached results.")
         
         # Subcommands
