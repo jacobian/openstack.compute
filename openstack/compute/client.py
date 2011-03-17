@@ -12,6 +12,8 @@ if not hasattr(urlparse, 'parse_qsl'):
     import cgi
     urlparse.parse_qsl = cgi.parse_qsl
 
+from openstack.compute import exceptions
+
 class ComputeClient(httplib2.Http):
     
     def __init__(self, config):
