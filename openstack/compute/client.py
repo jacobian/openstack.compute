@@ -12,8 +12,6 @@ if not hasattr(urlparse, 'parse_qsl'):
     import cgi
     urlparse.parse_qsl = cgi.parse_qsl
 
-from openstack.compute import exceptions, __version__
-
 class ComputeClient(httplib2.Http):
     
     def __init__(self, config):
@@ -34,7 +32,12 @@ class ComputeClient(httplib2.Http):
             
         resp, body = super(ComputeClient, self).request(*args, **kwargs)
         if body:
-            body = json.loads(body)
+            try:
+                body = json.loads(body)
+            except ValueError:
+                # OpenStack is JSON expect when it's not -- error messages
+                # sometimes aren't actually JSON.
+                body = {'error' : {'message' : body}}
         else:
             body = None
 
