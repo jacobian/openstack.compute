@@ -12,7 +12,7 @@ Usage
 First create an instance of :class:`Compute` with your credentials::
 
     >>> from openstack.compute import Compute
-    >>> compute = Compute(USERNAME, API_KEY)
+    >>> compute = Compute(username=USERNAME, apikey=API_KEY)
 
 Then call methods on the :class:`Compute` object:
 
@@ -55,8 +55,12 @@ For example::
      <Flavor: 8GB server>,
      <Flavor: 15.5GB server>]
 
+    >>> compute.images.list()
+    [<Image: Windows Server 2008 R2 x64 - MSSQL2K8R2>,...]
+
     >>> fl = compute.flavors.find(ram=512)
-    >>> cloudservers.servers.create("my-server", flavor=fl)
+    >>> im = compute.images.find('Ubuntu 10.10 (maverick)')
+    >>> compute.servers.create("my-server", image=im, flavor=fl)
     <Server: my-server>
 
 For more information, see the reference:
