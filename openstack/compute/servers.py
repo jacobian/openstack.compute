@@ -95,7 +95,10 @@ class Server(base.Resource):
         """
         Shortcut to get this server's primary public IP address.
         """
-        return self.addresses['public'][0]
+        if self.addresses['public']:
+            return self.addresses['public'][0]
+        else:
+            return u''
     
     @property
     def private_ip(self):
