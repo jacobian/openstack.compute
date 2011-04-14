@@ -36,14 +36,14 @@ class FakeServer(Compute):
         called = self.client.callstack[-1][0:2]
 
         assert self.client.callstack, "Expected %s %s but no calls were made." % expected
-        
+
         assert expected == called, 'Expected %s %s; got %s %s' % (expected + called)
-        
+
         if body is not None:
             assert_equal(self.client.callstack[-1][2], body)
-        
+
         self.client.callstack = []
-        
+
     def authenticate(self):
         pass
 
@@ -52,7 +52,7 @@ class FakeClient(ComputeClient):
         self.username = 'username'
         self.apikey = 'apikey'
         self.callstack = []
-    
+
     def _cs_request(self, url, method, **kwargs):
         # Check that certain things are called correctly
         if method in ['GET', 'DELETE']:
@@ -65,11 +65,11 @@ class FakeClient(ComputeClient):
         callback = "%s_%s" % (method.lower(), munged_url)
         if not hasattr(self, callback):
             fail('Called unknown API method: %s %s' % (method, url))
-        
+
         # Note the call
         self.callstack.append((method, url, kwargs.get('body', None)))
-        
-        status, body = getattr(self, callback)(**kwargs)        
+
+        status, body = getattr(self, callback)(**kwargs)
         return httplib2.Response({"status": status}), body
 
     def _munge_get_url(self, url):
@@ -77,10 +77,10 @@ class FakeClient(ComputeClient):
 
     #
     # Limits
-    # 
+    #
 
     def get_limits(self, **kw):
-        return (200, {"limits" : { 
+        return (200, {"limits" : {
             "rate" : [
                 {
                     "verb" : "POST",
@@ -90,7 +90,7 @@ class FakeClient(ComputeClient):
                     "remaining" : 2,
                     "unit" : "MINUTE",
                     "resetTime" : 1244425439
-                }, 
+                },
                 {
                     "verb" : "POST",
                     "URI" : "*/servers",
@@ -126,24 +126,24 @@ class FakeClient(ComputeClient):
                     "unit" : "MINUTE",
                     "resetTime" : 1244425439
                 }
-            ], 
+            ],
             "absolute" : {
                 "maxTotalRAMSize" : 51200,
                 "maxIPGroups" : 50,
                 "maxIPGroupMembers" : 25
             }
         }})
-        
+
     #
     # Servers
     #
-        
+
     def get_servers(self, **kw):
         return (200, {"servers": [
             {'id': 1234, 'name': 'sample-server'},
             {'id': 5678, 'name': 'sample-server2'}
         ]})
-        
+
     def get_servers_detail(self, **kw):
         return (200, {"servers" : [
             {
@@ -179,17 +179,17 @@ class FakeClient(ComputeClient):
                 }
             }
         ]})
-        
+
     def post_servers(self, body, **kw):
         assert_equal(body.keys(), ['server'])
-        assert_has_keys(body['server'], 
+        assert_has_keys(body['server'],
                         required = ['name', 'imageId', 'flavorId'],
                         optional = ['sharedIpGroupId', 'metadata', 'personality'])
         if 'personality' in body['server']:
             for pfile in body['server']['personality']:
                 assert_has_keys(pfile, required=['path', 'contents'])
         return (202, self.get_servers_1234()[1])
-        
+
     def get_servers_1234(self, **kw):
         r = {'server': self.get_servers_detail()[1]['servers'][0]}
         return (200, r)
@@ -202,35 +202,35 @@ class FakeClient(ComputeClient):
         assert_equal(body.keys(), ['server'])
         assert_has_keys(body['server'], optional=['name', 'adminPass'])
         return (204, None)
-            
+
     def delete_servers_1234(self, **kw):
         return (202, None)
-    
+
     #
     # Server Addresses
     #
-    
+
     def get_servers_1234_ips(self, **kw):
         return (200, {'addresses': self.get_servers_1234()[1]['server']['addresses']})
-            
+
     def get_servers_1234_ips_public(self, **kw):
         return (200, {'public': self.get_servers_1234_ips()[1]['addresses']['public']})
-        
+
     def get_servers_1234_ips_private(self, **kw):
         return (200, {'private': self.get_servers_1234_ips()[1]['addresses']['private']})
-    
+
     def put_servers_1234_ips_public_1_2_3_4(self, body, **kw):
         assert_equal(body.keys(), ['shareIp'])
-        assert_has_keys(body['shareIp'], required=['sharedIpGroupId', 'configureServer'])
+        assert_has_keys(body['shareIp'], required=['configureServer'])
         return (202, None)
-    
+
     def delete_servers_1234_ips_public_1_2_3_4(self, **kw):
         return (202, None)
-        
+
     #
     # Server actions
     #
-    
+
     def post_servers_1234_action(self, body, **kw):
         assert_equal(len(body.keys()), 1)
         action = body.keys()[0]
@@ -250,29 +250,29 @@ class FakeClient(ComputeClient):
         else:
             fail("Unexpected server action: %s" % action)
         return (202, None)
-        
+
     #
     # Flavors
     #
-    
+
     def get_flavors(self, **kw):
         return (200, {'flavors': [
             {'id': 1, 'name': '256 MB Server'},
             {'id': 2, 'name': '512 MB Server'}
         ]})
-        
+
     def get_flavors_detail(self, **kw):
         return (200, {'flavors': [
             {'id': 1, 'name': '256 MB Server', 'ram': 256, 'disk': 10},
             {'id': 2, 'name': '512 MB Server', 'ram': 512, 'disk': 20}
         ]})
-        
+
     def get_flavors_1(self, **kw):
         return (200, {'flavor': self.get_flavors_detail()[1]['flavors'][0]})
-    
+
     def get_flavors_2(self, **kw):
         return (200, {'flavor': self.get_flavors_detail()[1]['flavors'][1]})
-    
+
     #
     # Images
     #
@@ -281,11 +281,11 @@ class FakeClient(ComputeClient):
             {'id': 1, 'name': 'CentOS 5.2'},
             {'id': 2, 'name': 'My Server Backup'}
         ]})
-        
+
     def get_images_detail(self, **kw):
         return (200, {'images': [
             {
-                'id': 1, 
+                'id': 1,
                 'name': 'CentOS 5.2',
                 "updated" : "2010-10-10T12:00:00Z",
                 "created" : "2010-08-10T12:00:00Z",
@@ -301,21 +301,21 @@ class FakeClient(ComputeClient):
                 "progress" : 80
             }
         ]})
-        
+
     def get_images_1(self, **kw):
         return (200, {'image': self.get_images_detail()[1]['images'][0]})
 
     def get_images_2(self, **kw):
         return (200, {'image': self.get_images_detail()[1]['images'][1]})
-        
+
     def post_images(self, body, **kw):
         assert_equal(body.keys(), ['image'])
         assert_has_keys(body['image'], required=['serverId', 'name'])
         return (202, self.get_images_1()[1])
-        
+
     def delete_images_1(self, **kw):
         return (204, None)
-    
+
     #
     # Backup schedules
     #
@@ -325,41 +325,31 @@ class FakeClient(ComputeClient):
             "weekly" : "THURSDAY",
             "daily" : "H_0400_0600"
         }})
-        
+
     def post_servers_1234_backup_schedule(self, body, **kw):
         assert_equal(body.keys(), ['backupSchedule'])
         assert_has_keys(body['backupSchedule'], required=['enabled'], optional=['weekly', 'daily'])
         return (204, None)
-        
+
     def delete_servers_1234_backup_schedule(self, **kw):
         return (204, None)
-        
+
     #
     # Shared IP groups
     #
     def get_shared_ip_groups(self, **kw):
-        return (200, {'sharedIpGroups': [
-            {'id': 1, 'name': 'group1'},
-            {'id': 2, 'name': 'group2'},
-        ]})
-        
+        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+
     def get_shared_ip_groups_detail(self, **kw):
-        return (200, {'sharedIpGroups': [
-            {'id': 1, 'name': 'group1', 'servers': [1234]},
-            {'id': 2, 'name': 'group2', 'servers': [5678]},
-        ]})
-        
+        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+
     def get_shared_ip_groups_1(self, **kw):
-        return (200, {'sharedIpGroup': self.get_shared_ip_groups_detail()[1]['sharedIpGroups'][0]})
+        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
 
     def post_shared_ip_groups(self, body, **kw):
         assert_equal(body.keys(), ['sharedIpGroup'])
         assert_has_keys(body['sharedIpGroup'], required=['name'], optional=['server'])
-        return (201, {'sharedIpGroup': {
-            'id': 10101,
-            'name': body['sharedIpGroup']['name'],
-            'servers': 'server' in body['sharedIpGroup'] and [body['sharedIpGroup']['server']] or None
-        }})
-        
+        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+
     def delete_shared_ip_groups_1(self, **kw):
-        return (204, None)
+        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})

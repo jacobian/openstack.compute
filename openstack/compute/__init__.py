@@ -19,7 +19,6 @@ from openstack.compute.exceptions import (ComputeException, BadRequest, Unauthor
     Forbidden, NotFound, OverLimit)
 from openstack.compute.flavors import FlavorManager, Flavor
 from openstack.compute.images import ImageManager, Image
-from openstack.compute.ipgroups import IPGroupManager, IPGroup
 from openstack.compute.servers import ServerManager, Server, REBOOT_HARD, REBOOT_SOFT
 
 DEFAULT_CONFIG_FILE = os.path.expanduser('~/.openstack/compute.conf')
@@ -48,7 +47,6 @@ class Compute(object):
         self.client = ComputeClient(self.config)
         self.flavors = FlavorManager(self)
         self.images = ImageManager(self)
-        self.ipgroups = IPGroupManager(self)
         self.servers = ServerManager(self)
     
     def authenticate(self):
