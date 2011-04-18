@@ -10,6 +10,7 @@ import mock
 import httplib2
 from nose.tools import assert_equal
 from openstack.compute import Compute, Config
+from openstack.compute.api import API_OPTIONS
 from openstack.compute.client import ComputeClient
 from utils import fail, assert_in, assert_not_in, assert_has_keys
 
@@ -19,6 +20,8 @@ class FakeConfig(object):
     auth_url = "https://auth.api.rackspacecloud.com/v1.0"
     user_agent = 'python-openstack-compute/test'
     allow_cache = False
+    cloud_api = 'RACKSPACE'
+    #cloud_api = 'OPENSTACK'
 
 class FakeServer(Compute):
     def __init__(self, **kwargs):
@@ -52,6 +55,8 @@ class FakeClient(ComputeClient):
         self.username = 'username'
         self.apikey = 'apikey'
         self.callstack = []
+        self.cloud_api = 'RACKSPACE'
+        #self.cloud_api = 'OPENSTACK'
 
     def _cs_request(self, url, method, **kwargs):
         # Check that certain things are called correctly
@@ -221,7 +226,7 @@ class FakeClient(ComputeClient):
 
     def put_servers_1234_ips_public_1_2_3_4(self, body, **kw):
         assert_equal(body.keys(), ['shareIp'])
-        assert_has_keys(body['shareIp'], required=['configureServer'])
+        assert_has_keys(body['shareIp'], required=['sharedIpGroupId', 'configureServer'])
         return (202, None)
 
     def delete_servers_1234_ips_public_1_2_3_4(self, **kw):
@@ -338,18 +343,42 @@ class FakeClient(ComputeClient):
     # Shared IP groups
     #
     def get_shared_ip_groups(self, **kw):
-        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+        if 'IPGROUPS' in API_OPTIONS[self.cloud_api]:
+            return (200, {'sharedIpGroups': [
+                {'id': 1, 'name': 'group1'},
+                {'id': 2, 'name': 'group2'},
+            ]})
+        else:
+            return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
 
     def get_shared_ip_groups_detail(self, **kw):
-        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+        if 'IPGROUPS' in API_OPTIONS[self.cloud_api]:
+            return (200, {'sharedIpGroups': [
+                {'id': 1, 'name': 'group1', 'servers': [1234]},
+                {'id': 2, 'name': 'group2', 'servers': [5678]},
+            ]})
+        else:
+            return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
 
     def get_shared_ip_groups_1(self, **kw):
-        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+        if 'IPGROUPS' in API_OPTIONS[self.cloud_api]:
+            return (200, {'sharedIpGroup': self.get_shared_ip_groups_detail()[1]['sharedIpGroups'][0]})
+        else:
+            return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+
 
     def post_shared_ip_groups(self, body, **kw):
         assert_equal(body.keys(), ['sharedIpGroup'])
         assert_has_keys(body['sharedIpGroup'], required=['name'], optional=['server'])
-        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+        if 'IPGROUPS' in API_OPTIONS[self.cloud_api]:
+            return (201, {'sharedIpGroup': {
+                'id': 10101,
+                'name': body['sharedIpGroup']['name'],
+                'servers': 'server' in body['sharedIpGroup'] and [body['sharedIpGroup']['server']] or None
+            }})
+        else:
+            return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
 
     def delete_shared_ip_groups_1(self, **kw):
-        return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})
+            return (204, None)
+            return (501, {u'notImplemented': {u'message': u'The server has either erred or is incapable of performing\r\nthe requested operation.\r\n', u'code': 501}})

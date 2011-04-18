@@ -77,11 +77,11 @@ def test_share_ip():
     s = cs.servers.get(1234)
 
     # Share via instance
-    s.share_ip(address='1.2.3.4')
+    s.share_ip(ipgroup=1, address='1.2.3.4')
     cs.assert_called('PUT', '/servers/1234/ips/public/1.2.3.4')
 
     # Share via manager
-    cs.servers.share_ip(s, address='1.2.3.4', configure=False)
+    cs.servers.share_ip(s, ipgroup=1, address='1.2.3.4', configure=False)
     cs.assert_called('PUT', '/servers/1234/ips/public/1.2.3.4')
 
 def test_unshare_ip():

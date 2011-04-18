@@ -138,11 +138,19 @@ def test_boot_invalid_keyfile():
     invalid_file = os.path.join(os.path.dirname(__file__), 'asdfasdfasdfasdf')
     assert_raises(CommandError, shell, 'boot some-server --image 1 --key %s' % invalid_file)
 
-# def test_boot_ipgroup():
-# Removed: IP groups are no longer supported by openstack API 2011-04-14
+def test_boot_ipgroup():
+    shell('boot --image 1 --ipgroup 1 some-server')
+    assert_called(
+        'POST', '/servers',
+        {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1, 'sharedIpGroupId': 1}}
+    )
 
-# def test_boot_ipgroup_name():
-# Removed: IP groups are no longer supported by openstack API 2011-04-14
+def test_boot_ipgroup_name():
+    shell('boot --image 1 --ipgroup group1 some-server')
+    assert_called(
+        'POST', '/servers',
+        {'server': {'flavorId': 1, 'name': 'some-server', 'imageId': 1, 'sharedIpGroupId': 1}}
+    )
 
 def test_flavor_list():
     shell('flavor-list')
@@ -167,24 +175,40 @@ def test_ip_share():
     shell('ip-share sample-server 1 1.2.3.4')
     assert_called(
         'PUT', '/servers/1234/ips/public/1.2.3.4',
-        {'shareIp': {'configureServer': True}}
+        {'shareIp': {'sharedIpGroupId': 1, 'configureServer': True}}
     )
 
 def test_ip_unshare():
     shell('ip-unshare sample-server 1.2.3.4')
     assert_called('DELETE', '/servers/1234/ips/public/1.2.3.4')
 
-# def test_ipgroup_list():
-# Removed: IP groups are no longer supported by openstack API 2011-04-14
+def test_ipgroup_list():
+    shell('ipgroup-list')
+    assert_in(('GET', '/shared_ip_groups/detail', None), _shell.compute.client.callstack)
+    assert_called('GET', '/servers/5678')
 
-# def test_ipgroup_show():
-# Removed: IP groups are no longer supported by openstack API 2011-04-14
+def test_ipgroup_show():
+    shell('ipgroup-show 1')
+    assert_called('GET', '/shared_ip_groups/1')
+    shell('ipgroup-show group2')
+    # does a search, not a direct GET
+    assert_called('GET', '/shared_ip_groups/detail')
 
-# def test_ipgroup_create():
-# Removed: IP groups are no longer supported by openstack API 2011-04-14
+def test_ipgroup_create():
+    shell('ipgroup-create a-group')
+    assert_called(
+        'POST', '/shared_ip_groups',
+        {'sharedIpGroup': {'name': 'a-group'}}
+    )
+    shell('ipgroup-create a-group sample-server')
+    assert_called(
+        'POST', '/shared_ip_groups',
+        {'sharedIpGroup': {'name': 'a-group', 'server': 1234}}
+    )
 
-# def test_ipgroup_delete():
-# Removed: IP groups are no longer supported by openstack API 2011-04-14
+def test_ipgroup_delete():
+    shell('ipgroup-delete group1')
+    assert_called('DELETE', '/shared_ip_groups/1')
 
 def test_list():
     shell('list')

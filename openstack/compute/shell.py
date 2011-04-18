@@ -77,6 +77,8 @@ class ComputeShell(object):
             action = 'store_true',
             default = False,
             help = "Allow the API to returned cached results.")
+        self.parser.add_argument('--cloud-api',
+            help = "API of the cloud service to be managed: either RACKSPACE or OPENSTACK")
 
         # Subcommands
         subparsers = self.parser.add_subparsers(metavar='<subcommand>')
@@ -202,7 +204,7 @@ class ComputeShell(object):
     @arg('--ipgroup',
          default = None,
          metavar = '<group>',
-         help = "DEPRICATED")
+         help = "IP group name or ID (see 'cloudservers ipgroup-list'). DEPRICATED in OpenStack")
     @arg('--meta',
          metavar = "<key=value>",
          action = 'append',
@@ -226,6 +228,13 @@ class ComputeShell(object):
         """Boot a new server."""
         flavor = args.flavor or self.compute.flavors.find(ram=256)
         image = args.image or self.compute.images.find(name="Ubuntu 10.04 LTS (lucid)")
+
+        # Map --ipgroup <name> to an ID.
+        # XXX do this for flavor/image?
+        if args.ipgroup:
+            ipgroup = self._find_ipgroup(args.ipgroup)
+        else:
+            ipgroup = None
 
         metadata = dict(v.split('=') for v in args.meta)
 
@@ -257,7 +266,7 @@ class ComputeShell(object):
             except IOError, e:
                 raise CommandError("Can't open '%s': %s" % (keyfile, e))
 
-        server = self.compute.servers.create(args.name, image, flavor, meta=metadata, files=files)
+        server = self.compute.servers.create(args.name, image, flavor, ipgroup, metadata, files)
         print_dict(server._info)
 
     def do_flavor_list(self, args):
@@ -293,8 +302,8 @@ class ComputeShell(object):
     def do_ip_share(self, args):
         """Share an IP address from the given IP group onto a server."""
         server = self._find_server(args.server)
-        #group = self._find_ipgroup(args.group)
-        server.share_ip(args.address)
+        group = self._find_ipgroup(args.group)
+        server.share_ip(group, args.address)
 
     @arg('server', metavar='<server>', help='Name or ID of server.')
     @arg('address', metavar='<address>', help='Shared IP address to remove from the server.')
@@ -302,6 +311,38 @@ class ComputeShell(object):
         """Stop sharing an given address with a server."""
         server = self._find_server(args.server)
         server.unshare_ip(args.address)
+
+    def do_ipgroup_list(self, args):
+        """Show IP groups."""
+        def pretty_server_list(ipgroup):
+            return ", ".join(self.compute.servers.get(id).name for id in ipgroup.servers)
+
+        print_list(self.compute.ipgroups.list(),
+                   fields = ['ID', 'Name', 'Server List'],
+                   formatters = {'Server List': pretty_server_list})
+
+    @arg('group', metavar='<group>', help='Name or ID of group.')
+    def do_ipgroup_show(self, args):
+        """Show details about a particular IP group."""
+        group = self._find_ipgroup(args.group)
+        print_dict(group._info)
+
+    @arg('name', metavar='<name>', help='What to name this new group.')
+    @arg('server', metavar='<server>', nargs='?',
+         help='Server (name or ID) to make a member of this new group.')
+    def do_ipgroup_create(self, args):
+        """Create a new IP group."""
+        if args.server:
+            server = self._find_server(args.server)
+        else:
+            server = None
+        group = self.compute.ipgroups.create(args.name, server)
+        print_dict(group._info)
+
+    @arg('group', metavar='<group>', help='Name or ID of group.')
+    def do_ipgroup_delete(self, args):
+        """Delete an IP group."""
+        self._find_ipgroup(args.group).delete()
 
     def do_list(self, args):
         """List active servers."""
@@ -386,6 +427,10 @@ class ComputeShell(object):
         """Get a server by name or ID."""
         return self._find_resource(self.compute.servers, server)
 
+    def _find_ipgroup(self, group):
+        """Get an IP group by name or ID."""
+        return self._find_resource(self.compute.ipgroups, group)
+    
     def _find_image(self, image):
         """Get an image by name or ID."""
         return self._find_resource(self.compute.images, image)

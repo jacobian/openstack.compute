@@ -1,4 +1,5 @@
 from openstack.compute import base
+from openstack.compute.api import API_OPTIONS
 
 REBOOT_SOFT, REBOOT_HARD = 'SOFT', 'HARD'
 
@@ -21,17 +22,23 @@ class Server(base.Resource):
         """
         self.manager.update(self, name, password)
 
-    def share_ip(self, address, configure=True):
+    def share_ip(self, ipgroup=None, address=None, configure=True):
         """
         Share an IP address from the given IP group onto this server.
 
-        :param ipgroup: DEPRICATED
+        :param ipgroup: The :class:`IPGroup` that the given address belongs to.
+                        DEPRICATED in OpenStack.
         :param address: The IP address to share.
         :param configure: If ``True``, the server will be automatically
                          configured to use this IP. I don't know why you'd
                          want this to be ``False``.
         """
-        self.manager.share_ip(self, address, configure)
+        # to make ipgroup optional without making address optional or changing the
+        # order of the parameters in the function signature
+        if address == None:
+            raise TypeError("Address is required")
+
+        self.manager.share_ip(self, ipgroup, address, configure)
 
     def unshare_ip(self, address):
         """
@@ -198,19 +205,33 @@ class ServerManager(base.ManagerWithFind):
         """
         self._delete("/servers/%s" % base.getid(server))
 
-    def share_ip(self, server, address, configure=True):
+    def share_ip(self, server, ipgroup=None, address=None, configure=True):
         """
         Share an IP address from the given IP group onto a server.
 
         :param server: The :class:`Server` (or its ID) to share onto.
+        :param ipgroup: The :class:`IPGroup` that the given address belongs to.
+                        DEPRICATED in OpenStack
         :param address: The IP address to share.
         :param configure: If ``True``, the server will be automatically
                          configured to use this IP. I don't know why you'd
                          want this to be ``False``.
         """
-        server = base.getid(server)
-        body = {'shareIp': {'configureServer': configure}}
-        self._update("/servers/%s/ips/public/%s" % (server, address), body)
+        # to make ipgroup optional without making address optional or changing the
+        # order of the parameters in the function signature
+        if address == None:
+            raise TypeError("Address is required")
+
+        if 'IPGROUPS' in API_OPTIONS[self.api.config.cloud_api]:
+            if ipgroup == None:
+                raise TypeError("IPGroup is required")
+            server = base.getid(server)
+            ipgroup = base.getid(ipgroup)
+            body = {'shareIp': {'sharedIpGroupId': ipgroup, 'configureServer': configure}}
+            self._update("/servers/%s/ips/public/%s" % (server, address), body)
+        else:
+            #TODO: Jwilcox(2011-04-18) share ip without ipgroup openstack 1.1 api
+            pass
 
     def unshare_ip(self, server, address):
         """
