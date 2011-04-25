@@ -105,7 +105,10 @@ class Server(base.Resource):
         """
         Shortcut to get this server's primary private IP address.
         """
-        return self.addresses['private'][0]
+        if self.addresses['private']:
+            return self.addresses['private'][0]
+        else:
+            return u''
     
 class ServerManager(base.ManagerWithFind):
     resource_class = Server
