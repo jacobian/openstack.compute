@@ -36,10 +36,10 @@ them as environment variables::
 
     export OPENSTACK_COMPUTE_USERNAME=jacobian
     export OPENSTACK_COMPUTE_API_KEY=yadayada
-    
-You'll find complete documentation on the shell by running 
+
+You'll find complete documentation on the shell by running
 ``cloudservers help``::
-    
+
     usage: openstack-compute [--username USERNAME] [--apikey APIKEY] <subcommand> ...
 
     Command-line interface to the OpenStack Compute API.
@@ -82,13 +82,13 @@ You'll find complete documentation on the shell by running
       --apikey APIKEY       Defaults to env[OPENSTACK_COMPUTE_API_KEY].
 
     See "openstack-compute help COMMAND" for help on a specific command.
-    
+
 Python API
 ----------
 
 There's also a `complete Python API`__.
 
-__ http://openstack-compute.rtfd.org/
+__ http://openstackcompute.rtfd.org/
 
 By way of a quick-start::
 
@@ -99,13 +99,13 @@ By way of a quick-start::
     >>> compute.servers.list()
     [...]
     >>> s = compute.servers.create(image=2, flavor=1, name='myserver')
-    
+
     ... time passes ...
-    
+
     >>> s.reboot()
-    
+
     ... time passes ...
-    
+
     >>> s.delete()
 
 FAQ
@@ -117,7 +117,7 @@ What's wrong with libcloud?
     common denominator; I needed access to the OpenStack-specific APIs (shared
     IP groups, image snapshots, resizing, etc.). I also wanted a command-line
     utility.
-    
+
 What's new?
 -----------
 
